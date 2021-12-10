@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "partidos")
+@Entity(name = "cargos")
 public class CargoModel
 {
     @Id
