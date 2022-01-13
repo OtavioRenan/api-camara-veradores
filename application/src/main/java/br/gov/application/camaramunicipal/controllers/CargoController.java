@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.gov.application.camaramunicipal.utils.FactoryResponseEntity;
-import br.gov.application.camaramunicipal.exceptions.DefaultException;
 import br.gov.application.camaramunicipal.models.CargoModel;
 import br.gov.application.camaramunicipal.services.CargoService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class CargoController
 {
     private final CargoService service;
-
-    private FactoryResponseEntity response = new FactoryResponseEntity();
 
     @GetMapping
     public List<CargoModel> findAll()
@@ -38,49 +36,25 @@ public class CargoController
     @GetMapping("{id}")
     public Object find(@PathVariable Long id)
     {
-        try {
-            return this.service.find(id);
-        } catch (DefaultException e) {
-            return this.response.create(e.getMessage(), e.getStatusCode());
-        } catch (Exception e) {
-            return this.response.create(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        return this.service.find(id);
     }
 
     @PostMapping
     public Object save(@Valid @RequestBody CargoModel model)
     {
-        try {
-            return this.service.save(model);
-        } catch (DefaultException e) {
-            return this.response.create(e.getMessage(), e.getStatusCode());
-        } catch (Exception e) {
-            return this.response.create(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        return this.service.save(model);
     }
 
     @PutMapping("{id}")
     public Object update(@Valid @RequestBody CargoModel model, @PathVariable Long id)
     {
-        try {
-            return this.service.update(model, id);
-        } catch (DefaultException e) {
-            return this.response.create(e.getMessage(), e.getStatusCode());
-        } catch (Exception e) {
-            return this.response.create(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        return this.service.update(model, id);
     }
 
     @DeleteMapping("{id}")
     public Object delete(@PathVariable Long id)
     {
-        try {
-            this.service.delete(id);
-            return this.response.create("Cargo excluido com sucesso.", HttpStatus.OK);
-        } catch (DefaultException e) {
-            return this.response.create(e.getMessage(), e.getStatusCode());
-        } catch (Exception e) {
-            return this.response.create(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        this.service.delete(id);
+        return new FactoryResponseEntity().create(("Cargo excluido com sucesso."), HttpStatus.OK);
     }
 }

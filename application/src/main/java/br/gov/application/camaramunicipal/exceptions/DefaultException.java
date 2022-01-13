@@ -2,14 +2,18 @@ package br.gov.application.camaramunicipal.exceptions;
 
 import org.springframework.http.HttpStatus;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class DefaultException extends RuntimeException
 {
-    private HttpStatus code;
+    @Getter
+    @Setter
+    private HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 
     public DefaultException()
     {
         super("Erro interno.");
-        this.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public DefaultException(String message)
@@ -21,15 +25,5 @@ public class DefaultException extends RuntimeException
     {
         super(message);
         this.setStatusCode(httpStatus);
-    }
-
-    private void setStatusCode(HttpStatus code)
-    {
-        this.code = code;
-    }
-
-    public HttpStatus getStatusCode()
-    {
-        return this.code;
     }
 }

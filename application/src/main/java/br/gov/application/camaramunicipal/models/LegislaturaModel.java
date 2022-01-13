@@ -11,50 +11,32 @@ import javax.persistence.Id;
 
 import javax.validation.constraints.NotEmpty;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "legislaturas")
 public class LegislaturaModel
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    @Setter
-    @Column(name = "id")
     private Long id;
     
-    @Getter
-    @Setter
     @NotEmpty(message = "A descrição é obrigatória.")
-    @Column(name = "descricao")
     private String descricao;
 
-    @Getter
-    @Setter
     @NotEmpty(message = "A data de início é obrigatória.")
     @Column(name = "data_inicio")
-    private Date data_inicio;
+    private Date dataInicio;
 
-    @Getter
-    @Setter
     @NotEmpty(message = "A data do termino é obrigatória.")
     @Column(name = "data_fim")
-    private Date data_fim;
+    private Date dataFim;
 
-    @Getter
-    @Setter
     @Column(name = "created_at")
-    private Timestamp created_at;
+    private Timestamp createdAt;
 
-    @Getter
-    @Setter
     @Column(name = "updated_at")
-    private Timestamp updated_at;
+    private Timestamp updatedAt;
 }
