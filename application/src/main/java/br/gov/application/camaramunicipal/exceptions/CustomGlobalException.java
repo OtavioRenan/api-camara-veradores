@@ -7,16 +7,19 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import br.gov.application.camaramunicipal.utils.FactoryMessageErrorUtil;
+import br.gov.application.camaramunicipal.utils.FactoryResponseEntity;
 
 @ControllerAdvice
 public class CustomGlobalException
 {
+    private final FactoryResponseEntity response = new FactoryResponseEntity();
+
     private FactoryMessageErrorUtil message = new FactoryMessageErrorUtil();
     
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<?> customValidationErrorHanding(Exception e)
     {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return this.response.create(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // Errors for @Valid
@@ -29,6 +32,6 @@ public class CustomGlobalException
     @ExceptionHandler(DefaultException.class)
     protected ResponseEntity<?> customValidationErrorHanding(DefaultException e)
     {
-        return new ResponseEntity<>(e.getMessage(), e.getStatusCode());
+        return this.response.create(e.getMessage(), e.getStatusCode());
     }
 }
