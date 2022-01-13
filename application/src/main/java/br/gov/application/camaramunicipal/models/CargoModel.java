@@ -10,6 +10,8 @@ import javax.persistence.Id;
 
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,9 +30,11 @@ public class CargoModel
     @NotEmpty(message = "A descrição é obrigatório.")
     private String descricao;
 
+    @JsonIgnore
     @Column(name = "created_at")
     private Timestamp createdAt;
-
+    
+    @JsonIgnore
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 }
