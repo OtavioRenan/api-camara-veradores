@@ -1,5 +1,8 @@
 package br.gov.application.camaramunicipal.exceptions;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -10,8 +13,7 @@ import br.gov.application.camaramunicipal.utils.FactoryMessageErrorUtil;
 import br.gov.application.camaramunicipal.utils.FactoryResponseEntity;
 
 @ControllerAdvice
-public class CustomGlobalException
-{
+public class CustomGlobalException {
     private final FactoryResponseEntity response = new FactoryResponseEntity();
 
     private FactoryMessageErrorUtil message = new FactoryMessageErrorUtil();
@@ -20,6 +22,14 @@ public class CustomGlobalException
     protected ResponseEntity<?> customValidationErrorHanding(Exception e)
     {
         return this.response.create(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> customValidationErrorHanding(ConstraintViolationException e)
+    {
+        ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+
+        return new ResponseEntity<>(this.message.create(violation.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     // Errors for @Valid

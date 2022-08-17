@@ -3,15 +3,24 @@ package br.gov.application.camaramunicipal.domain.dtos;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 
 public class LegislatureDTO {
     private Long id;
     
+    @NotNull(message = "A descrição é obrigatória.")
+    @NotEmpty(message = "A descrição é obrigatória.")
     private String description;
 
+    @NotNull(message = "A data de início é obrigatória.")
+    @NotEmpty(message = "A data de início é obrigatória.")
     private Date dateStart;
 
+    @NotNull(message = "A data do término é obrigatória.")
+    @NotEmpty(message = "A data do término é obrigatória.")
     private Date dateEnd;
 
     private Timestamp createdAt;
@@ -28,13 +37,9 @@ public class LegislatureDTO {
 
     private final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private String formatDate(Date date) {
-        return dateUtil.formatDateBr(date);
-    }
+    private String formatDate(Date date) { return dateUtil.formatDateBr(date); }
 
-    private String formatDate(Timestamp date) {
-        return dateUtil.formatDateBr(date);
-    }
+    private String formatDate(Timestamp date) { return dateUtil.formatDateBr(date); }
 
     public LegislatureDTO() {}
 

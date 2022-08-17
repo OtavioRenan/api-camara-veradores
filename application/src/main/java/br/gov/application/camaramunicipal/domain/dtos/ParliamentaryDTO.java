@@ -3,24 +3,41 @@ package br.gov.application.camaramunicipal.domain.dtos;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import br.gov.application.camaramunicipal.domain.Parliamentary;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 
 public class ParliamentaryDTO {
     private Long id;
 
+    @NotNull(message = "O partido é obrigatório.")
+    @NotEmpty(message = "O partido é obrigatório.")
     private Long politicalParyId;
 
+    @NotNull(message = "A legislatura é obrigatória.")
+    @NotEmpty(message = "A legislatura é obrigatória.")
     private Long legislatureId;
     
+    @NotNull(message = "O nome é obrigatório.")
+    @NotEmpty(message = "O nome é obrigatório.")
     private String name;
 
+    @NotNull(message = "O nome social é obrigatório.")
+    @NotEmpty(message = "O nome social é obrigatório.")
     private String socialName;
 
+    @NotNull(message = "O e-mail é obrigatório.")
+    @NotEmpty(message = "O e-mail é obrigatório.")
     private String email;
 
-    private String telefone;
+    @NotNull(message = "O telefone é obrigatório.")
+    @NotEmpty(message = "O telefone é obrigatório.")
+    private String numberPhone;
 
+    @NotNull(message = "A data de nascimento é obrigatória.")
+    @NotEmpty(message = "A data de nascimento é obrigatória.")
     private Date birth;
 
     private Timestamp createdAt;
@@ -35,13 +52,9 @@ public class ParliamentaryDTO {
 
     private final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private String formatDate(Date date) {
-        return dateUtil.formatDateBr(date);
-    }
+    private String formatDate(Date date) { return dateUtil.formatDateBr(date); }
 
-    private String formatDate(Timestamp date) {
-        return dateUtil.formatDateBr(date);
-    }
+    private String formatDate(Timestamp date) { return dateUtil.formatDateBr(date); }
 
     public ParliamentaryDTO() {}
 
@@ -52,7 +65,7 @@ public class ParliamentaryDTO {
         name = parliamentary.getName();
         socialName = parliamentary.getSocialName();
         email = parliamentary.getEmail();
-        telefone = parliamentary.getTelefone();
+        numberPhone = parliamentary.getNumberPhone();
         birth = parliamentary.getBirth();
         createdAt = parliamentary.getCreatedAt();
         updatedAt = parliamentary.getUpdatedAt();
@@ -86,9 +99,9 @@ public class ParliamentaryDTO {
 
     public void setEmail(String email) { this.email = email; }
 
-    public String getTelefone() { return telefone; }
+    public String getNumberPhone() { return numberPhone; }
 
-    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public void setNumberPhone(String numberPhone) { this.numberPhone = numberPhone; }
 
     public Date getBirth() { return birth; }
 

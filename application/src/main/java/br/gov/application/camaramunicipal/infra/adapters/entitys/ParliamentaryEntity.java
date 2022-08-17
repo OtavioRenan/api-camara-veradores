@@ -39,7 +39,7 @@ public class ParliamentaryEntity {
     private String email;
 
     @Column(name = "number_phone")
-    private String telefone;
+    private String numberPhone;
 
     @NotEmpty(message = "O nascimento é obrigatório.")
     private Date birth;
@@ -59,7 +59,7 @@ public class ParliamentaryEntity {
         name = parliamentary.getName();
         socialName = parliamentary.getSocialName();
         email = parliamentary.getEmail();
-        telefone = parliamentary.getTelefone();
+        numberPhone = parliamentary.getNumberPhone();
         birth = parliamentary.getBirth();
         createdAt = parliamentary.getCreatedAt();
         updatedAt = parliamentary.getUpdatedAt();
@@ -93,9 +93,9 @@ public class ParliamentaryEntity {
 
     public void setEmail(String email) { this.email = email; }
 
-    public String getTelefone() { return telefone; }
+    public String getNumberPhone() { return numberPhone; }
 
-    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public void setNumberPhone(String numberPhone) { this.numberPhone = numberPhone; }
 
     public Date getBirth() { return birth; }
 

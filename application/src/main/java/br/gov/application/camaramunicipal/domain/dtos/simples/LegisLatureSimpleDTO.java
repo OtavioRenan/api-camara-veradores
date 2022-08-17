@@ -13,9 +13,7 @@ public class LegisLatureSimpleDTO {
 
     private String dateEndBr;
 
-    private String formatDate(Date date) {
-        return new FactoryFormatDateUtil().formatDateBr(date);
-    }
+    private String formatDate(Date date) { return new FactoryFormatDateUtil().formatDateBr(date); }
 
     public LegisLatureSimpleDTO(Long id, String description, Date dateStart, Date dateEnd) {
         this.id = id;

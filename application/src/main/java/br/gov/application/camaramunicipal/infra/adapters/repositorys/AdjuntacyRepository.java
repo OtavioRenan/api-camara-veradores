@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.Adjutancy;
@@ -26,6 +28,13 @@ public class AdjuntacyRepository implements AdjutancyRepositoryPort {
         List<AdjutancyEntity> models = this.repository.findAll();
 
         return models.stream().map( AdjutancyEntity::toAdjutancy ).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Adjutancy> findAll(int offset, int pageSize) {
+        Page<AdjutancyEntity> models = this.repository.findAll(PageRequest.of(offset, pageSize));
+
+        return models.map( AdjutancyEntity::toAdjutancy );
     }
 
     @Override

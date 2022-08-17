@@ -16,23 +16,13 @@ public class FactoryFormatDateUtil {
 
     private static final String TIME_ZONE = "GMT-03:00";
    
-    private String simpleDateFormatDate(Date date) {
-        return Objects.isNull(date) ? null : new SimpleDateFormat(DT_BR).format(date);
-    }
+    private String simpleDateFormatDate(Date date) { return Objects.isNull(date) ? null : new SimpleDateFormat(DT_BR).format(date); }
 
-    private String simpleDateFormatDate(Timestamp date) {
-        return Objects.isNull(date) ? null : new SimpleDateFormat(DT_BR).format(date);
-    }
+    private String simpleDateFormatDate(Timestamp date) { return Objects.isNull(date) ? null : new SimpleDateFormat(DT_BR).format(date); }
 
-    public Timestamp getNowWithZoneIdBr() {
-        return Timestamp.valueOf(LOCAL_DATE_TIME);
-    }
+    public Timestamp getNowWithZoneIdBr() { return Timestamp.valueOf(LOCAL_DATE_TIME); }
 
-    public String formatDateBr(Date date) {
-        return simpleDateFormatDate(date);
-    }
+    public String formatDateBr(Date date) { return simpleDateFormatDate(date); }
 
-    public String formatDateBr(Timestamp date) {
-        return simpleDateFormatDate(date);
-    }
+    public String formatDateBr(Timestamp date) { return simpleDateFormatDate(date); }
 }

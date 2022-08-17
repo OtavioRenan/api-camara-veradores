@@ -2,13 +2,20 @@ package br.gov.application.camaramunicipal.domain.dtos;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 
 public class PoliticalParyDTO {
     private Long id;
     
+    @NotNull(message = "O nome é obrigatório.")
+    @NotEmpty(message = "O nome é obrigatório.")
     private String name;
 
+    @NotNull(message = "A sigla é obrigatória.")
+    @NotEmpty(message = "A sigla é obrigatória.")
     private String initials;
 
     private Timestamp createdAt;
@@ -19,9 +26,7 @@ public class PoliticalParyDTO {
 
     private String updatedAtBr;
 
-    private String formatDate(Timestamp date) {
-        return new FactoryFormatDateUtil().formatDateBr(date);
-    }
+    private String formatDate(Timestamp date) { return new FactoryFormatDateUtil().formatDateBr(date); }
 
     public PoliticalParyDTO() {}
 

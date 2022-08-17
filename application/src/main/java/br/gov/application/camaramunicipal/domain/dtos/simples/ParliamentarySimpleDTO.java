@@ -12,15 +12,13 @@ public class ParliamentarySimpleDTO {
 
     private String email;
 
-    private String telefone;
+    private String numberPhone;
 
     private String birthBr;
 
     private final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private String formatDate(Date date) {
-        return dateUtil.formatDateBr(date);
-    }
+    private String formatDate(Date date) { return dateUtil.formatDateBr(date); }
 
     public ParliamentarySimpleDTO() {}
 
@@ -28,7 +26,7 @@ public class ParliamentarySimpleDTO {
         id = parliamentary.getId();
         socialName = parliamentary.getSocialName();
         email = parliamentary.getEmail();
-        telefone = parliamentary.getTelefone();
+        numberPhone = parliamentary.getNumberPhone();
 
         birthBr = formatDate( parliamentary.getBirth() );
     }
@@ -45,9 +43,9 @@ public class ParliamentarySimpleDTO {
 
     public void setEmail(String email) { this.email = email; }
 
-    public String getTelefone() { return telefone; }
+    public String getNumberPhone() { return numberPhone; }
 
-    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public void setNumberPhone(String numberPhone) { this.numberPhone = numberPhone; }
 
     public String getBirthBr() { return birthBr; }
 

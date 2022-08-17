@@ -2,16 +2,25 @@ package br.gov.application.camaramunicipal.domain.dtos;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 
 public class DirectorTableDTO {
     
     private Long id;
     
+    @NotNull(message = "A legislatura é obrigatória.")
+    @NotEmpty(message = "A legislatura é obrigatória.")
     private Long legislatureId;
 
+    @NotNull(message = "O cargo é obrigatório.")
+    @NotEmpty(message = "O cargo é obrigatório.")
     private Long adjutancyId;
 
+    @NotNull(message = "Parlamentar é obrigatório (a).")
+    @NotEmpty(message = "Parlamentar é obrigatório (a).")
     private Long parliamentaryId;
 
     private Timestamp createdAt;
@@ -22,9 +31,7 @@ public class DirectorTableDTO {
 
     private String updatedAtBr;
 
-    private String formatDate(Timestamp date) {
-        return new FactoryFormatDateUtil().formatDateBr(date);
-    }
+    private String formatDate(Timestamp date) { return new FactoryFormatDateUtil().formatDateBr(date); }
 
     public DirectorTableDTO() {}
 

@@ -26,13 +26,15 @@ public class Adjutancy {
         this.updatedAt = updatedAt;
     }
 
-    public AdjutancyDTO toAdjutancyDTO() {
-        return new AdjutancyDTO(id, name, description, createdAt, updatedAt);
+    public Adjutancy(AdjutancyDTO dto) {
+        this.id = dto.getId();
+        this.name = dto.getName();
+        this.description = dto.getDescription();
     }
 
-    public AdjutancySimpleDTO toAdjutancySimpleDTO() {
-        return new AdjutancySimpleDTO(id, name, description);
-    }
+    public AdjutancyDTO toAdjutancyDTO() { return new AdjutancyDTO(id, name, description, createdAt, updatedAt); }
+
+    public AdjutancySimpleDTO toAdjutancySimpleDTO() { return new AdjutancySimpleDTO(id, name, description); }
 
     public Long getId() { return id; }
 
