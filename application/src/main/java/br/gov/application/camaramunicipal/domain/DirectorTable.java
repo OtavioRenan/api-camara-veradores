@@ -2,6 +2,9 @@ package br.gov.application.camaramunicipal.domain;
 
 import java.sql.Timestamp;
 
+import br.gov.application.camaramunicipal.domain.dtos.DirectorTableDTO;
+import br.gov.application.camaramunicipal.domain.dtos.simples.DirectorTableSimpleDTO;
+
 public class DirectorTable {
 
     private Long id;
@@ -26,6 +29,17 @@ public class DirectorTable {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public DirectorTable(DirectorTableDTO dto) {
+        id = dto.getId();
+        legislatureId = dto.getLegislatureId();
+        adjutancyId = dto.getAdjutancyId();
+        parliamentaryId = dto.getLegislatureId();
+    }
+
+    public DirectorTableDTO toDirectorTableDTO() { return new DirectorTableDTO(id, legislatureId, adjutancyId, parliamentaryId, createdAt, updatedAt); }
+
+    public DirectorTableSimpleDTO toDirectorTableSimpleDTO() { return new DirectorTableSimpleDTO(id, legislatureId, adjutancyId, parliamentaryId); }
 
     public Long getId() { return id; }
 

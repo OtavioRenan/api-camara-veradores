@@ -25,21 +25,26 @@ public class AdjuntacyRepository implements AdjutancyRepositoryPort {
 
     @Override
     public List<Adjutancy> findAll() {
-        List<AdjutancyEntity> models = this.repository.findAll();
+        return toListAdjuntacy(
+            repository.findAll());
+    }
 
-        return models.stream().map( AdjutancyEntity::toAdjutancy ).collect(Collectors.toList());
+    @Override
+    public List<Adjutancy> findAllLimit(int limit) {
+        return toListAdjuntacy(
+            repository.findAllLimit(limit));
     }
 
     @Override
     public Page<Adjutancy> findAll(int offset, int pageSize) {
-        Page<AdjutancyEntity> models = this.repository.findAll(PageRequest.of(offset, pageSize));
+        Page<AdjutancyEntity> models = repository.findAll(PageRequest.of(offset, pageSize));
 
         return models.map( AdjutancyEntity::toAdjutancy );
     }
 
     @Override
     public Adjutancy findById(Long id) {
-        Optional<AdjutancyEntity> model = this.repository.findById(id);
+        Optional<AdjutancyEntity> model = repository.findById(id);
 
         validIfModelExists(model);
 
@@ -48,19 +53,19 @@ public class AdjuntacyRepository implements AdjutancyRepositoryPort {
 
     @Override
     public Adjutancy save(Adjutancy adjutance) {
-        return this.repository.save( new AdjutancyEntity(adjutance) ).toAdjutancy();
+        return repository.save( new AdjutancyEntity(adjutance) ).toAdjutancy();
     }
 
     @Override
-    public void deteleById(Long id) {
-        Optional<AdjutancyEntity> model = this.repository.findById(id);
-
-        validIfModelExists(model);
-        
-        this.repository.deleteById(id);
+    public void detele(Adjutancy adjutancy) {
+        repository.delete( new AdjutancyEntity(adjutancy) );
     }
 
     private void validIfModelExists(Optional<?> model) {
         new FactoryExceptionNotFund().create(model, "Cargo não encontrado.");
+    }
+
+    private List<Adjutancy> toListAdjuntacy(List<AdjutancyEntity> list) {
+        return list.stream().map( AdjutancyEntity::toAdjutancy ).collect(Collectors.toList());
     }
 }

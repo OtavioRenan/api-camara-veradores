@@ -13,7 +13,7 @@ import br.gov.application.camaramunicipal.utils.FactoryMessageErrorUtil;
 import br.gov.application.camaramunicipal.utils.FactoryResponseEntity;
 
 @ControllerAdvice
-public class CustomGlobalException {
+public class CustomExceptionGlobal {
     private final FactoryResponseEntity response = new FactoryResponseEntity();
 
     private FactoryMessageErrorUtil message = new FactoryMessageErrorUtil();

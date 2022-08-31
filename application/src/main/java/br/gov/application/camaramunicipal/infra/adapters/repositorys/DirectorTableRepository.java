@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.DirectorTable;
@@ -22,14 +24,26 @@ public class DirectorTableRepository implements DirectorTableRepositoryPort {
 
     @Override
     public List<DirectorTable> findAll() {
-        List<DirectorTableEntity> models = this.repository.findAll();
+        return toListDirectorTable(
+            repository.findAll());
+    }
 
-        return models.stream().map( DirectorTableEntity::toDirectorTable ).collect(Collectors.toList());
+    @Override
+    public List<DirectorTable> findAllLimit(int limit) {
+        return toListDirectorTable(
+            repository.findAllLimit(limit));
+    }
+
+    @Override
+    public Page<DirectorTable> findAll(int offSet, int pageSize) {
+        Page<DirectorTableEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
+
+        return models.map( DirectorTableEntity::toDirectorTable );
     }
 
     @Override
     public DirectorTable findById(Long id) {
-        Optional<DirectorTableEntity> model = this.repository.findById(id);
+        Optional<DirectorTableEntity> model = repository.findById(id);
 
         validIfModelExists(model);
 
@@ -38,19 +52,19 @@ public class DirectorTableRepository implements DirectorTableRepositoryPort {
 
     @Override
     public DirectorTable save(DirectorTable directorTable) {
-        return this.repository.save( new DirectorTableEntity(directorTable) ).toDirectorTable();
+        return repository.save( new DirectorTableEntity(directorTable) ).toDirectorTable();
     }
 
     @Override
-    public void deteleById(Long id) {
-        Optional<DirectorTableEntity> model = this.repository.findById(id);
-
-        validIfModelExists(model);
-        
-        this.repository.deleteById(id);
+    public void detele(DirectorTable directorTable) {
+        repository.delete( new DirectorTableEntity(directorTable) );
     }
 
     private void validIfModelExists(Optional<?> model) {
         new FactoryExceptionNotFund().create(model, "Mesa diretora não encontrada.");
+    }
+
+    private List<DirectorTable> toListDirectorTable(List<DirectorTableEntity> list) {
+        return list.stream().map( DirectorTableEntity::toDirectorTable ).collect(Collectors.toList());
     }
 }

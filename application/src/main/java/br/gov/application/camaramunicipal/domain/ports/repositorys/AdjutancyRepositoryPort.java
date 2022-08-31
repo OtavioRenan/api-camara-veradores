@@ -9,11 +9,13 @@ import br.gov.application.camaramunicipal.domain.Adjutancy;
 public interface AdjutancyRepositoryPort {
     List<Adjutancy> findAll();
 
-    Page<Adjutancy> findAll(int offSet, int pageSize);    
+    List<Adjutancy> findAllLimit(int limit);
+
+    Page<Adjutancy> findAll(int offSet, int pageSize);
 
     Adjutancy findById(Long id);
 
     Adjutancy save(Adjutancy adjutancy);
 
-    void deteleById(Long id);
+    void detele(Adjutancy adjutancy);
 }

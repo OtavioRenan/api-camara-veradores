@@ -26,13 +26,15 @@ public class Commission {
         this.updatedAt = updatedAt;
     }
 
-    public CommissionDTO toCommissionDTO() {
-        return new CommissionDTO(id, name, description, createdAt, updatedAt);
+    public Commission(CommissionDTO dto) {
+        id = dto.getId();
+        name = dto.getName();
+        description = dto.getDescription();
     }
 
-    public CommissionSimpleDTO toCommissionSimpleDTO() {
-        return new CommissionSimpleDTO(id, name, description);
-    }
+    public CommissionDTO toCommissionDTO() { return new CommissionDTO(id, name, description, createdAt, updatedAt); }
+
+    public CommissionSimpleDTO toCommissionSimpleDTO() { return new CommissionSimpleDTO(id, name, description); }
 
     public Long getId() { return id; }
 

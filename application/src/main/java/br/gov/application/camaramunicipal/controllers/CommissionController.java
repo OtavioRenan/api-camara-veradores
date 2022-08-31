@@ -15,49 +15,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.gov.application.camaramunicipal.domain.dtos.LegislatureDTO;
-import br.gov.application.camaramunicipal.domain.dtos.simples.LegisLatureSimpleDTO;
-import br.gov.application.camaramunicipal.domain.ports.interfaces.LegislatureServicePort;
+import br.gov.application.camaramunicipal.domain.dtos.CommissionDTO;
+import br.gov.application.camaramunicipal.domain.dtos.simples.CommissionSimpleDTO;
+import br.gov.application.camaramunicipal.domain.ports.interfaces.CommissionServicePort;
 import br.gov.application.camaramunicipal.utils.FactoryResponseEntity;
+
 @RestController
-@RequestMapping("/api/legislatura")
-public class LegislaturaController
-{
-    private final LegislatureServicePort service;
+@RequestMapping("/api/commission")
+public class CommissionController {
+    
+    private final CommissionServicePort service;
 
     private static final FactoryResponseEntity response = new FactoryResponseEntity();
 
-    public LegislaturaController(LegislatureServicePort service) {
+    public CommissionController(CommissionServicePort service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<LegisLatureSimpleDTO> findAll(@RequestParam Map<String, String> inputs) {
+    public List<CommissionSimpleDTO> findAll(@RequestParam Map<String, String> inputs) {
         return service.findAll(inputs);
     }
 
     @GetMapping("/pagination/{offSet}/{pageSize}")
-    public Page<LegisLatureSimpleDTO> findAll(@RequestParam Map<String, String> inputs, @PathVariable int offSet, @PathVariable int pageSize) {
+    public Page<CommissionSimpleDTO> findAll(@RequestParam Map<String, String> inputs, @PathVariable int offSet, @PathVariable int pageSize) {
         return service.findAll(inputs, offSet, pageSize);
     }
 
     @PostMapping
-    public LegislatureDTO save(@RequestBody LegislatureDTO dto) {
+    public CommissionDTO save(@RequestBody CommissionDTO dto) {
         return service.save(dto);
     }
 
     @PutMapping("/{id}")
-    public LegislatureDTO findById(@RequestBody LegislatureDTO dto, @PathVariable Long id) {
+    public CommissionDTO findById(@RequestBody CommissionDTO dto, @PathVariable Long id) {
         return service.save(dto, id);
     }
 
     @GetMapping("/{id}")
-    public LegislatureDTO findById(@PathVariable Long id) {
+    public CommissionDTO findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @DeleteMapping("/{id}")
     public Object delete(@PathVariable Long id) {
-        return response.create(("Legislatura excluida com sucesso."), HttpStatus.OK);
+        return response.create(("Comissão excluida com sucesso."), HttpStatus.OK);
     }
 }

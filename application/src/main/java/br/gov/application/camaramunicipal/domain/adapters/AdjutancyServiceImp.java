@@ -2,9 +2,12 @@ package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.Adjutancy;
 import br.gov.application.camaramunicipal.domain.dtos.AdjutancyDTO;
@@ -27,14 +30,20 @@ public class AdjutancyServiceImp implements AdjutancyServicePort {
     public List<AdjutancySimpleDTO> findAll(Map<String, String> inputs) {
         List<Adjutancy> models = repository.findAll();
 
+        models = filters(inputs, models);
+
         return models.stream().map( Adjutancy::toAdjutancySimpleDTO ).collect(Collectors.toList());
     }
 
     @Override
     public Page<AdjutancySimpleDTO> findAll(Map<String, String> inputs, int offSet, int pageSize) {
-        Page<Adjutancy> models = repository.findAll(offSet, pageSize);
+        if(inputs.size() > 0) {
+            List<AdjutancySimpleDTO> models = findAll(inputs);
+            return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size());
+        }
 
-        return models.map( Adjutancy::toAdjutancySimpleDTO );
+        Page<Adjutancy> pages = repository.findAll(offSet, pageSize);
+        return pages.map( Adjutancy::toAdjutancySimpleDTO );
     }
 
     @Override
@@ -54,7 +63,6 @@ public class AdjutancyServiceImp implements AdjutancyServicePort {
 
     @Override
     public AdjutancyDTO save(AdjutancyDTO dto, Long id) {
-
         Adjutancy oldModel = repository.findById(id);
 
         Adjutancy model = new Adjutancy(dto);
@@ -67,6 +75,27 @@ public class AdjutancyServiceImp implements AdjutancyServicePort {
 
     @Override
     public void delete(Long id) {
-        this.repository.deteleById(id);
+        Adjutancy adjutancy = repository.findById(id);
+
+        repository.detele(adjutancy);
     }
+
+    private List<Adjutancy> filters(Map<String, String> inputs, List<Adjutancy> models) {
+
+        String fields = isNullOrEmptry(inputs.get("fields"));
+
+        if(!Objects.isNull(fields)) { models = filterByFields(models, fields); }
+
+        return models;
+    }
+
+    private List<Adjutancy> filterByFields(List<Adjutancy> list, String fileds) {
+        return list.stream().filter( adjutancy -> filterByFields(adjutancy, fileds) ).collect(Collectors.toList());
+    }
+
+    private boolean filterByFields(Adjutancy adjutancy, String fields) {
+        return adjutancy.getName().contains(fields) || adjutancy.getDescription().contains(fields);
+    }
+
+    private String isNullOrEmptry(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : str; }
 }

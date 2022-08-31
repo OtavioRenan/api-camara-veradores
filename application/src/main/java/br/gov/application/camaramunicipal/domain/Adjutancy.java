@@ -27,9 +27,9 @@ public class Adjutancy {
     }
 
     public Adjutancy(AdjutancyDTO dto) {
-        this.id = dto.getId();
-        this.name = dto.getName();
-        this.description = dto.getDescription();
+        id = dto.getId();
+        name = dto.getName();
+        description = dto.getDescription();
     }
 
     public AdjutancyDTO toAdjutancyDTO() { return new AdjutancyDTO(id, name, description, createdAt, updatedAt); }

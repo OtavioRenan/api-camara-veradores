@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.Commission;
@@ -22,14 +24,26 @@ public class CommissionRepository implements CommissionRepositoryPort {
 
     @Override
     public List<Commission> findAll() {
-        List<CommissionEntity> models = this.repository.findAll();
+        return toListCommission(
+            repository.findAll());
+    }
 
-        return models.stream().map( CommissionEntity::toCommission ).collect(Collectors.toList());
+    @Override
+    public List<Commission> findAllLimit(int limit) {
+        return toListCommission(
+            repository.findAllLimit(limit));
+    }
+
+    @Override
+    public Page<Commission> findAll(int offSet, int pageSize) {
+        Page<CommissionEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
+
+        return models.map( CommissionEntity::toCommission );
     }
 
     @Override
     public Commission findById(Long id) {
-        Optional<CommissionEntity> model = this.repository.findById(id);
+        Optional<CommissionEntity> model = repository.findById(id);
 
         validIfModelExists(model);
 
@@ -38,19 +52,19 @@ public class CommissionRepository implements CommissionRepositoryPort {
 
     @Override
     public Commission save(Commission commission) {
-        return this.repository.save( new CommissionEntity(commission) ).toCommission();
+        return repository.save( new CommissionEntity(commission) ).toCommission();
     }
 
     @Override
-    public void deteleById(Long id) {
-        Optional<CommissionEntity> model = this.repository.findById(id);
-
-        validIfModelExists(model);
-        
-        this.repository.deleteById(id);
+    public void detele(Commission commission) {
+        repository.delete(new CommissionEntity(commission));
     }
 
     private void validIfModelExists(Optional<?> model) {
         new FactoryExceptionNotFund().create(model, "Comissão não encontrada.");
+    }
+
+    private List<Commission> toListCommission(List<CommissionEntity> list) {
+        return list.stream().map( CommissionEntity::toCommission ).collect(Collectors.toList());
     }
 }

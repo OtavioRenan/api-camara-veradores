@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.Parliamentary;
@@ -22,14 +24,26 @@ public class ParliamentaryRepository implements ParliamentaryRepositoryPort {
 
     @Override
     public List<Parliamentary> findAll() {
-        List<ParliamentaryEntity> models = this.repository.findAll();
+        return toListParliamentary(
+            repository.findAll());
+    }
 
-        return models.stream().map( ParliamentaryEntity::toParliamentary ).collect(Collectors.toList());
+    @Override
+    public List<Parliamentary> findAllLimit(int limit) {
+        return toListParliamentary(
+            repository.findAllLimit(limit));
+    }
+
+    @Override
+    public Page<Parliamentary> findAll(int offSet, int pageSize) {
+        Page<ParliamentaryEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
+
+        return models.map( ParliamentaryEntity::toParliamentary );
     }
 
     @Override
     public Parliamentary findById(Long id) {
-        Optional<ParliamentaryEntity> model = this.repository.findById(id);
+        Optional<ParliamentaryEntity> model = repository.findById(id);
 
         validIfModelExists(model);
 
@@ -38,19 +52,19 @@ public class ParliamentaryRepository implements ParliamentaryRepositoryPort {
 
     @Override
     public Parliamentary save(Parliamentary parliamentary) {
-        return this.repository.save( new ParliamentaryEntity(parliamentary) ).toParliamentary();
+        return repository.save( new ParliamentaryEntity(parliamentary) ).toParliamentary();
     }
 
     @Override
-    public void deteleById(Long id) {
-        Optional<ParliamentaryEntity> model = this.repository.findById(id);
-
-        validIfModelExists(model);
-        
-        this.repository.deleteById(id);
+    public void detele(Parliamentary parliamentary) {        
+        repository.delete( new ParliamentaryEntity(parliamentary) );
     }
 
     private void validIfModelExists(Optional<?> model) {
         new FactoryExceptionNotFund().create(model, "Parlamentar não encontrado.");
+    }
+
+    private List<Parliamentary> toListParliamentary(List<ParliamentaryEntity> list) {
+        return list.stream().map( ParliamentaryEntity::toParliamentary ).collect(Collectors.toList());
     }
 }

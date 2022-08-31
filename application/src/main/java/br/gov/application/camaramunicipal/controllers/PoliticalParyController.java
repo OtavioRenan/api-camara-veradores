@@ -15,49 +15,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.gov.application.camaramunicipal.domain.dtos.LegislatureDTO;
-import br.gov.application.camaramunicipal.domain.dtos.simples.LegisLatureSimpleDTO;
-import br.gov.application.camaramunicipal.domain.ports.interfaces.LegislatureServicePort;
+import br.gov.application.camaramunicipal.domain.dtos.PoliticalParyDTO;
+import br.gov.application.camaramunicipal.domain.dtos.simples.PoliticalParySimpleDTO;
+import br.gov.application.camaramunicipal.domain.ports.interfaces.PoliticalParyServicePort;
 import br.gov.application.camaramunicipal.utils.FactoryResponseEntity;
+
 @RestController
-@RequestMapping("/api/legislatura")
-public class LegislaturaController
+@RequestMapping("/api/political-pary")
+public class PoliticalParyController
 {
-    private final LegislatureServicePort service;
+    private final PoliticalParyServicePort service;
 
     private static final FactoryResponseEntity response = new FactoryResponseEntity();
 
-    public LegislaturaController(LegislatureServicePort service) {
+    public PoliticalParyController(PoliticalParyServicePort service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<LegisLatureSimpleDTO> findAll(@RequestParam Map<String, String> inputs) {
+    public List<PoliticalParySimpleDTO> findAll(@RequestParam Map<String, String> inputs) {
         return service.findAll(inputs);
     }
 
     @GetMapping("/pagination/{offSet}/{pageSize}")
-    public Page<LegisLatureSimpleDTO> findAll(@RequestParam Map<String, String> inputs, @PathVariable int offSet, @PathVariable int pageSize) {
+    public Page<PoliticalParySimpleDTO> findAll(@RequestParam Map<String, String> inputs, @PathVariable int offSet, @PathVariable int pageSize) {
         return service.findAll(inputs, offSet, pageSize);
     }
 
     @PostMapping
-    public LegislatureDTO save(@RequestBody LegislatureDTO dto) {
+    public PoliticalParyDTO save(@RequestBody PoliticalParyDTO dto) {
         return service.save(dto);
     }
 
     @PutMapping("/{id}")
-    public LegislatureDTO findById(@RequestBody LegislatureDTO dto, @PathVariable Long id) {
+    public PoliticalParyDTO findById(@RequestBody PoliticalParyDTO dto, @PathVariable Long id) {
         return service.save(dto, id);
     }
 
     @GetMapping("/{id}")
-    public LegislatureDTO findById(@PathVariable Long id) {
+    public PoliticalParyDTO findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @DeleteMapping("/{id}")
     public Object delete(@PathVariable Long id) {
-        return response.create(("Legislatura excluida com sucesso."), HttpStatus.OK);
+        return response.create(("Partido excluido com sucesso."), HttpStatus.OK);
     }
 }

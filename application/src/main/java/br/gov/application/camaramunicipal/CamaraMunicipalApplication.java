@@ -12,8 +12,7 @@ public class CamaraMunicipalApplication
 {
 	@PostConstruct
 	public void setTimeZone() {
-	  // Setting Spring Boot SetTimeZone
-	  TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
+	  TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
 	public static void main(String[] args)

@@ -11,10 +11,6 @@ public class FactoryFormatDateUtil {
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now( ZoneId.of("America/Sao_Paulo") );
 
     private static final String DT_BR = "dd/MM/yyyy";
-
-    private static final String HR_BR = "HH:mm";
-
-    private static final String TIME_ZONE = "GMT-03:00";
    
     private String simpleDateFormatDate(Date date) { return Objects.isNull(date) ? null : new SimpleDateFormat(DT_BR).format(date); }
 

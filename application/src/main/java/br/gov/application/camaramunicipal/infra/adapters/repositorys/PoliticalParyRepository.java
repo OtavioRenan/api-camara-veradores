@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.PoliticalPary;
@@ -22,14 +24,26 @@ public class PoliticalParyRepository implements PoliticalParyRepositoryPort {
 
     @Override
     public List<PoliticalPary> findAll() {
-        List<PoliticalParyEntity> models = this.repository.findAll();
+        return toListPoliticalPary(
+            repository.findAll());
+    }
 
-        return models.stream().map( PoliticalParyEntity::toPoliticalPary ).collect(Collectors.toList());
+    @Override
+    public List<PoliticalPary> findAllLimit(int limit) {
+        return toListPoliticalPary(
+            repository.findAllLimit(limit));
+    }
+
+    @Override
+    public Page<PoliticalPary> findAll(int offSet, int pageSize) {
+        Page<PoliticalParyEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
+
+        return models.map( PoliticalParyEntity::toPoliticalPary );
     }
 
     @Override
     public PoliticalPary findById(Long id) {
-        Optional<PoliticalParyEntity> model = this.repository.findById(id);
+        Optional<PoliticalParyEntity> model = repository.findById(id);
 
         validIfModelExists(model);
 
@@ -38,19 +52,19 @@ public class PoliticalParyRepository implements PoliticalParyRepositoryPort {
 
     @Override
     public PoliticalPary save(PoliticalPary politicalPary) {
-        return this.repository.save( new PoliticalParyEntity(politicalPary) ).toPoliticalPary();
+        return repository.save( new PoliticalParyEntity(politicalPary) ).toPoliticalPary();
     }
 
     @Override
-    public void deteleById(Long id) {
-        Optional<PoliticalParyEntity> model = this.repository.findById(id);
-
-        validIfModelExists(model);
-        
-        this.repository.deleteById(id);
+    public void detele(PoliticalPary politicalPary) {
+        repository.delete( new PoliticalParyEntity(politicalPary) );
     }
 
     private void validIfModelExists(Optional<?> model) {
         new FactoryExceptionNotFund().create(model, "Partido não encontrado.");
+    }
+
+    private List<PoliticalPary> toListPoliticalPary(List<PoliticalParyEntity> list) {
+        return list.stream().map( PoliticalParyEntity::toPoliticalPary ).collect(Collectors.toList());
     }
 }
