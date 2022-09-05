@@ -8,8 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CamaraMunicipalApplication
-{
+public class CamaraMunicipalApplication {
 	@PostConstruct
 	public void setTimeZone() {
 	  TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
