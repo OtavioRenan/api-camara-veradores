@@ -15,11 +15,11 @@ import br.gov.application.camaramunicipal.infra.adapters.jpaRepositorys.Adjutanc
 import br.gov.application.camaramunicipal.utils.FactoryExceptionNotFund;
 
 @Component
-public class AdjuntacyRepository implements AdjutancyRepositoryPort {
+public class AdjutancyRepository implements AdjutancyRepositoryPort {
 
     private final AdjutancySpringRepository repository;
 
-    public AdjuntacyRepository(AdjutancySpringRepository repository) {
+    public AdjutancyRepository(AdjutancySpringRepository repository) {
         this.repository = repository;
     }
 
