@@ -17,11 +17,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.gov.application.camaramunicipal.domain.Adjutancy;
 import br.gov.application.camaramunicipal.domain.adapters.AdjutancyServiceImp;
+import br.gov.application.camaramunicipal.domain.dtos.AdjutancyDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.AdjutancySimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.AdjutancyServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.AdjutancyRepositoryPort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -39,18 +42,21 @@ public class AdjutancyServiceTest {
     @MockBean
     private AdjutancyRepositoryPort repository;
 
-    private static final Long ID = 1L;
+    private static final Timestamp NOW = new Timestamp(System.currentTimeMillis());
 
-    private static final Adjutancy ADJUTANCY = new Adjutancy(ID, "Presidente", "Presidente de Comissão",  new Timestamp(System.currentTimeMillis()),  new Timestamp(System.currentTimeMillis()));
+    private static final Adjutancy ADJUTANCY =
+        new Adjutancy(1L, "Presidente", "Presidente de Comissão", NOW, NOW);
 
     @BeforeEach
     public void setup() {
         when(repository.findAll()).thenReturn(mockAdjutancies());
-        when(repository.findById(ID)).thenReturn(ADJUTANCY);
+        when(repository.findById(ADJUTANCY.getId())).thenReturn(ADJUTANCY);
+        when(repository.save(any(Adjutancy.class))).thenReturn(ADJUTANCY);
+        spy(ADJUTANCY);
     }
 
     @Test
-    public void successExpected_whenAcessFindAll() {
+    public void success_when_acess_findAll() {
         List<AdjutancySimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<AdjutancySimpleDTO> expected = new ArrayList<>();
@@ -60,6 +66,48 @@ public class AdjutancyServiceTest {
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getName(), actual.get(0).getName());
         assertEquals(expected.get(0).getDescription(), actual.get(0).getDescription());
+    }
+
+    @Test
+    public void success_when_acess_FindById() {
+        AdjutancyDTO actual = service.findById(ADJUTANCY.getId());
+        
+        AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
+     
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+    }
+
+    @Test
+    public void success_when_acess_save() {
+        AdjutancyDTO model = new AdjutancyDTO();
+        model.setName(ADJUTANCY.getName());
+        model.setDescription(ADJUTANCY.getDescription());
+
+        AdjutancyDTO actual = service.save(model);
+        
+        AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
+     
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+    }
+
+    @Test
+    public void success_when_acess_update() {
+        AdjutancyDTO actual = service.save(ADJUTANCY.toAdjutancyDTO());
+        
+        AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
+     
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+    }
+
+    @Test
+    public void success_when_acess_delete() {
+        service.delete(ADJUTANCY.getId());
     }
 
     private List<Adjutancy> mockAdjutancies() {
