@@ -28,7 +28,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class AdjutancyServiceTest {
+public class AdjutancyServiceImpTest {
 
     @TestConfiguration
     static class AdjutancyServiceTestCofig {
