@@ -15,12 +15,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import br.gov.application.camaramunicipal.domain.Adjutancy;
-import br.gov.application.camaramunicipal.domain.adapters.AdjutancyServiceImp;
-import br.gov.application.camaramunicipal.domain.dtos.AdjutancyDTO;
-import br.gov.application.camaramunicipal.domain.dtos.simples.AdjutancySimpleDTO;
-import br.gov.application.camaramunicipal.domain.ports.interfaces.AdjutancyServicePort;
-import br.gov.application.camaramunicipal.domain.ports.repositorys.AdjutancyRepositoryPort;
+import br.gov.application.camaramunicipal.domain.Commission;
+import br.gov.application.camaramunicipal.domain.adapters.CommissionServiceImp;
+import br.gov.application.camaramunicipal.domain.dtos.CommissionDTO;
+import br.gov.application.camaramunicipal.domain.dtos.simples.CommissionSimpleDTO;
+import br.gov.application.camaramunicipal.domain.ports.interfaces.CommissionServicePort;
+import br.gov.application.camaramunicipal.domain.ports.repositorys.CommissionRepositoryPort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,39 +28,39 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class AdjutancyServiceImpTest {
-
+public class CommissionServiceImpTest {
     @TestConfiguration
-    static class AdjutancyServiceImpTestCofig {
+    static class CommissionServiceImpTestConfig {
         @Bean
-        AdjutancyServicePort adjutancyService(AdjutancyRepositoryPort repository) { return new AdjutancyServiceImp(repository); }
+        CommissionServicePort commissionService(CommissionRepositoryPort repository) { return new CommissionServiceImp(repository); }
     }
 
     @Autowired
-    private AdjutancyServicePort service;
-    
+    private CommissionServicePort service;
+
     @MockBean
-    private AdjutancyRepositoryPort repository;
+    private CommissionRepositoryPort repository;
 
     private static final Timestamp NOW = new Timestamp(System.currentTimeMillis());
 
-    private static final Adjutancy ADJUTANCY =
-        new Adjutancy(1L, "Presidente", "Presidente de Comissão", NOW, NOW);
+    private static final Commission COMMISSION =
+        new Commission(1L, "Constituição e Justiça", "Permanente", NOW, NOW);
+
 
     @BeforeEach
     public void setup() {
-        when(repository.findAll()).thenReturn(mockAdjutancies());
-        when(repository.findById(ADJUTANCY.getId())).thenReturn(ADJUTANCY);
-        when(repository.save(any(Adjutancy.class))).thenReturn(ADJUTANCY);
-        spy(ADJUTANCY);
+        when(repository.findAll()).thenReturn(mockCommissions());
+        when(repository.findById(COMMISSION.getId())).thenReturn(COMMISSION);
+        when(repository.save(any(Commission.class))).thenReturn(COMMISSION);
+        spy(COMMISSION);
     }
 
     @Test
     public void success_when_acess_findAll() {
-        List<AdjutancySimpleDTO> actual = service.findAll(makeFilter("", ""));
+        List<CommissionSimpleDTO> actual = service.findAll(makeFilter("", ""));
         
-        List<AdjutancySimpleDTO> expected = new ArrayList<>();
-        expected.add(ADJUTANCY.toAdjutancySimpleDTO());
+        List<CommissionSimpleDTO> expected = new ArrayList<>();
+        expected.add(COMMISSION.toCommissionSimpleDTO());
      
         assertEquals(expected.size(), actual.size());
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
@@ -70,9 +70,9 @@ public class AdjutancyServiceImpTest {
 
     @Test
     public void success_when_acess_FindById() {
-        AdjutancyDTO actual = service.findById(ADJUTANCY.getId());
+        CommissionDTO actual = service.findById(COMMISSION.getId());
         
-        AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
+        CommissionDTO expected = COMMISSION.toCommissionDTO();
      
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -81,13 +81,13 @@ public class AdjutancyServiceImpTest {
 
     @Test
     public void success_when_acess_save() {
-        AdjutancyDTO model = new AdjutancyDTO();
-        model.setName(ADJUTANCY.getName());
-        model.setDescription(ADJUTANCY.getDescription());
+        CommissionDTO model = new CommissionDTO();
+        model.setName(COMMISSION.getName());
+        model.setDescription(COMMISSION.getDescription());
 
-        AdjutancyDTO actual = service.save(model);
+        CommissionDTO actual = service.save(model);
         
-        AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
+        CommissionDTO expected = COMMISSION.toCommissionDTO();
      
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -96,9 +96,9 @@ public class AdjutancyServiceImpTest {
 
     @Test
     public void success_when_acess_update() {
-        AdjutancyDTO actual = service.save(ADJUTANCY.toAdjutancyDTO());
+        CommissionDTO actual = service.save(COMMISSION.toCommissionDTO());
         
-        AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
+        CommissionDTO expected = COMMISSION.toCommissionDTO();
      
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -107,14 +107,14 @@ public class AdjutancyServiceImpTest {
 
     @Test
     public void success_when_acess_delete() {
-        service.delete(ADJUTANCY.getId());
+        service.delete(COMMISSION.getId());
     }
 
-    private List<Adjutancy> mockAdjutancies() {
-        List<Adjutancy> models = new ArrayList<>();
-        models.add(ADJUTANCY);
-        
-        return models;
+    private List<Commission> mockCommissions() {
+        List<Commission> list = new ArrayList<>();
+        list.add(COMMISSION);
+
+        return list;
     }
 
     private Map<String, String> makeFilter(String param, String value) {
