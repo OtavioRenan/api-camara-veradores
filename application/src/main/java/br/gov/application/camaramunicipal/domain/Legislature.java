@@ -40,6 +40,16 @@ public class Legislature {
         this.updatedAt = legislature.getUpdatedAt();
     }
 
+    public Legislature(Long id, String description, Date dateStart, Date dateEnd, Timestamp createdAt,
+        Timestamp updatedAt) {
+            this.id = id;
+            this.description = description;
+            this.dateStart = dateStart;
+            this.dateEnd = dateEnd;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
+    }
+
     public LegislatureDTO toLegislature() {
         return new LegislatureDTO(id, description, dateStart, dateEnd, createdAt, updatedAt);
     }

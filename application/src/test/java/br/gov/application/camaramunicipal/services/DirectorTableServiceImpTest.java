@@ -46,7 +46,6 @@ public class DirectorTableServiceImpTest {
     private static final DirectorTable DIRECTOR_TABLE =
         new DirectorTable(1L, 1L, 1L, 1L, NOW, NOW);
 
-
     @BeforeEach
     public void setup() {
         when(repository.findAll()).thenReturn(directorTables());
@@ -114,7 +113,6 @@ public class DirectorTableServiceImpTest {
     public void success_when_acess_delete() {
         service.delete(DIRECTOR_TABLE.getId());
     }
-
 
     private List<DirectorTable> directorTables() {
         List<DirectorTable> models = new ArrayList<>();

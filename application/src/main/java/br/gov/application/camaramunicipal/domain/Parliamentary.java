@@ -56,6 +56,20 @@ public class Parliamentary {
         updatedAt = parliamentary.getUpdatedAt();
     }
 
+    public Parliamentary(Long id, Long politicalParyId, Long legislatureId, String name, String socialName,
+        String email, String numberPhone, Date birth, Timestamp createdAt, Timestamp updatedAt) {
+            this.id = id;
+            this.politicalParyId = politicalParyId;
+            this.legislatureId = legislatureId;
+            this.name = name;
+            this.socialName = socialName;
+            this.email = email;
+            this.numberPhone = numberPhone;
+            this.birth = birth;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
+    }
+
     public ParliamentaryDTO toParliamentaryDTO() {
         return new ParliamentaryDTO(this);
     }
