@@ -21,6 +21,14 @@ public class PoliticalPary {
 
     public PoliticalPary() {}
 
+    public PoliticalPary(Long id, String name, String initials, Timestamp createdAt, Timestamp updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.initials = initials;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public PoliticalPary(PoliticalParyEntity pary) {
         id = pary.getId();
         name = pary.getName();
