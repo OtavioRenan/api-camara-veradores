@@ -1,5 +1,6 @@
 package br.gov.application.camaramunicipal.infra.adapters.repositorys;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +33,12 @@ public class ParliamentaryRepository implements ParliamentaryRepositoryPort {
     public List<Parliamentary> findAllLimit(int limit) {
         return toListParliamentary(
             repository.findAllLimit(limit));
+    }
+
+    @Override
+    public List<Parliamentary> findAllWithFilters(Long politicalParyId, Long legislatureId, Date birth, String fields) {
+        return toListParliamentary(
+            repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields));
     }
 
     @Override

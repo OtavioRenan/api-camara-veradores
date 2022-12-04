@@ -2,7 +2,6 @@ package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,11 +14,14 @@ import br.gov.application.camaramunicipal.domain.dtos.simples.PoliticalParySimpl
 import br.gov.application.camaramunicipal.domain.ports.interfaces.PoliticalParyServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.PoliticalParyRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
+import br.gov.application.camaramunicipal.utils.FiltersUtil;
 
 public class PoliticalParyServiceImp implements PoliticalParyServicePort {
     private final PoliticalParyRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
+
+    private static final FiltersUtil filterUtil =  new FiltersUtil();
 
     public PoliticalParyServiceImp(PoliticalParyRepositoryPort repository) {
         this.repository = repository;
@@ -29,20 +31,20 @@ public class PoliticalParyServiceImp implements PoliticalParyServicePort {
     public List<PoliticalParySimpleDTO> findAll(Map<String, String> inputs) {
         List<PoliticalPary> models = repository.findAll();
 
-        models = filters(inputs, models);
+        if( filterEmptry(inputs) ) {
+            models.addAll( repository.findAllLimit(200) );
+        } else {
+            models.addAll( filter(inputs) );
+        }
         
         return models.stream().map( PoliticalPary::toPoliticalParySimpleDTO ).collect(Collectors.toList());
     }
 
     @Override
     public Page<PoliticalParySimpleDTO> findAll(Map<String, String> inputs, int offset, int pageSize) {
-        if(inputs.size() > 0) {
-            List<PoliticalParySimpleDTO> models = findAll(inputs);
-            return new PageImpl<>(models, PageRequest.of(offset, pageSize), models.size());
-        }
-
-        Page<PoliticalPary> pages = repository.findAll(offset, pageSize);
-        return pages.map( PoliticalPary::toPoliticalParySimpleDTO );
+        List<PoliticalParySimpleDTO> models = findAll(inputs);
+        
+        return new PageImpl<>(models, PageRequest.of(offset, pageSize), models.size());        
     }
 
     @Override
@@ -79,24 +81,22 @@ public class PoliticalParyServiceImp implements PoliticalParyServicePort {
         repository.detele(politicalPary);
     }
 
-    private List<PoliticalPary> filters(Map<String, String> inputs, List<PoliticalPary> models) {
+    List<PoliticalPary> filter(Map<String, String> input) {
+        
+        String fields = null;
 
-        String name = isPresentReturnString(inputs.get("name"));
-        String initials = isPresentReturnString(inputs.get("initials"));
+        for(Map.Entry<String, String> v : input.entrySet()) {
+            if( equalsAndNoEmptry(v, "fields") ) { fields =  v.getValue(); }
+        }
 
-        if(!Objects.isNull(name)) { models = filterByName(models, name); }
-        if(!Objects.isNull(initials)) { models = filterByInitials(models, initials); }
-
-        return models;
+        return repository.findAllWithFilters(fields);
     }
 
-    private List<PoliticalPary> filterByName(List<PoliticalPary> list, String name) {
-        return list.stream().filter( politicalPary -> politicalPary.getName().contains(name) ).collect(Collectors.toList());
+    private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
+        return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private List<PoliticalPary> filterByInitials(List<PoliticalPary> list, String initials) {
-        return list.stream().filter( politicalPary -> politicalPary.getInitials().contains(initials) ).collect(Collectors.toList());
+    private boolean filterEmptry(Map<String, String> map) {
+        return filterUtil.filterEmptry(map);
     }
-
-    private String isPresentReturnString(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : str; }
 }

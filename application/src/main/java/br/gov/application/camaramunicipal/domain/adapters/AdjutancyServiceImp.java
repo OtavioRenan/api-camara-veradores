@@ -2,7 +2,6 @@ package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,12 +14,15 @@ import br.gov.application.camaramunicipal.domain.dtos.simples.AdjutancySimpleDTO
 import br.gov.application.camaramunicipal.domain.ports.interfaces.AdjutancyServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.AdjutancyRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
+import br.gov.application.camaramunicipal.utils.FiltersUtil;
 
 public class AdjutancyServiceImp implements AdjutancyServicePort {
 
     private final AdjutancyRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
+
+    private static final FiltersUtil filterUtil =  new FiltersUtil();
 
     public AdjutancyServiceImp(AdjutancyRepositoryPort repository) {
         this.repository = repository;
@@ -30,20 +32,20 @@ public class AdjutancyServiceImp implements AdjutancyServicePort {
     public List<AdjutancySimpleDTO> findAll(Map<String, String> inputs) {
         List<Adjutancy> models = repository.findAll();
 
-        models = filters(inputs, models);
+        if( filterEmptry(inputs) ) {
+            models.addAll( repository.findAllLimit(200) );
+        } else {
+            models.addAll( filter(inputs) );
+        }
 
         return models.stream().map( Adjutancy::toAdjutancySimpleDTO ).collect(Collectors.toList());
     }
 
     @Override
     public Page<AdjutancySimpleDTO> findAll(Map<String, String> inputs, int offSet, int pageSize) {
-        if(inputs.size() > 0) {
-            List<AdjutancySimpleDTO> models = findAll(inputs);
-            return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size());
-        }
-
-        Page<Adjutancy> pages = repository.findAll(offSet, pageSize);
-        return pages.map( Adjutancy::toAdjutancySimpleDTO );
+        List<AdjutancySimpleDTO> models = findAll(inputs);
+        
+        return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size());
     }
 
     @Override
@@ -80,22 +82,22 @@ public class AdjutancyServiceImp implements AdjutancyServicePort {
         repository.detele(adjutancy);
     }
 
-    private List<Adjutancy> filters(Map<String, String> inputs, List<Adjutancy> models) {
+    List<Adjutancy> filter(Map<String, String> input) {
+        
+        String fields = null;
 
-        String fields = isNullOrEmptry(inputs.get("fields"));
+        for(Map.Entry<String, String> v : input.entrySet()) {
+            if( equalsAndNoEmptry(v, "fields") ) { fields = v.getValue(); }
+        }
 
-        if(!Objects.isNull(fields)) { models = filterByFields(models, fields); }
-
-        return models;
+        return repository.findAllWithFilters(fields);
     }
 
-    private List<Adjutancy> filterByFields(List<Adjutancy> list, String fileds) {
-        return list.stream().filter( adjutancy -> filterByFields(adjutancy, fileds) ).collect(Collectors.toList());
+    private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
+        return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private boolean filterByFields(Adjutancy adjutancy, String fields) {
-        return adjutancy.getName().contains(fields) || adjutancy.getDescription().contains(fields);
+    private boolean filterEmptry(Map<String, String> map) {
+        return filterUtil.filterEmptry(map);
     }
-
-    private String isNullOrEmptry(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : str; }
 }

@@ -2,7 +2,6 @@ package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,12 +14,15 @@ import br.gov.application.camaramunicipal.domain.dtos.simples.DirectorTableSimpl
 import br.gov.application.camaramunicipal.domain.ports.interfaces.DirectorTableServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.DirectorTableRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
+import br.gov.application.camaramunicipal.utils.FiltersUtil;
 
 public class DirectorTableServiceImp implements DirectorTableServicePort {
 
     private final DirectorTableRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
+
+    private static final FiltersUtil filterUtil =  new FiltersUtil();
 
     public DirectorTableServiceImp(DirectorTableRepositoryPort repository) {
         this.repository = repository;
@@ -30,20 +32,20 @@ public class DirectorTableServiceImp implements DirectorTableServicePort {
     public List<DirectorTableSimpleDTO> findAll(Map<String, String> inputs) {
         List<DirectorTable> models = repository.findAll();
 
-        models = filters(inputs, models);
-        
+        if( filterEmptry(inputs) ) {
+            models.addAll( repository.findAllLimit(200) );
+        } else {
+            models.addAll( filter(inputs) );
+        }
+
         return models.stream().map( DirectorTable::toDirectorTableSimpleDTO ).collect(Collectors.toList());
     }
 
     @Override
     public Page<DirectorTableSimpleDTO> findAll(Map<String, String> inputs, int offSet, int pageSize) {
-        if(inputs.size() > 0) {
-            List<DirectorTableSimpleDTO> models = findAll(inputs);
-            return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size());
-        }
+        List<DirectorTableSimpleDTO> models = findAll(inputs);
 
-        Page<DirectorTable> pages = repository.findAll(offSet, pageSize);
-        return pages.map( DirectorTable::toDirectorTableSimpleDTO );
+        return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size());
     }
 
     @Override
@@ -80,30 +82,26 @@ public class DirectorTableServiceImp implements DirectorTableServicePort {
         repository.detele(directorTable);
     }
 
-    private List<DirectorTable> filters(Map<String, String> inputs, List<DirectorTable> models) {
+    List<DirectorTable> filter(Map<String, String> input) {
+        
+        Long legislatureId = null;
+        Long adjutancyId = null;
+        Long parliamentaryId = null;
 
-        Long legislatureId = isPresentReturnLong(inputs.get("legislatureId"));
-        Long adjutancyId = isPresentReturnLong(inputs.get("adjutancyId"));
-        Long parliamentaryId = isPresentReturnLong(inputs.get("parliamentaryId"));
+        for(Map.Entry<String, String> v : input.entrySet()) {
+            if( equalsAndNoEmptry(v, "legislatureId") ) { legislatureId = Long.valueOf( v.getValue() ); }
+            if( equalsAndNoEmptry(v, "adjutancyId") ) { adjutancyId = Long.valueOf( v.getValue() ); }
+            if( equalsAndNoEmptry(v, "parliamentaryId") ) { parliamentaryId = Long.valueOf( v.getValue() ); }
+        }
 
-        if(!Objects.isNull(legislatureId)) { models = filterByLegislatureId(models, legislatureId); }
-        if(!Objects.isNull(adjutancyId)) { models = filterByAdjutancyId(models, adjutancyId); }
-        if(!Objects.isNull(parliamentaryId)) { models = filterByParliamentaryId(models, parliamentaryId); }
-
-        return models;
+        return repository.findAllWithFilters(legislatureId, adjutancyId, parliamentaryId);
     }
 
-    private List<DirectorTable> filterByLegislatureId(List<DirectorTable> list, Long legislatureId) {
-        return list.stream().filter( directorTable -> directorTable.getLegislatureId().equals(legislatureId) ).collect(Collectors.toList());
+    private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
+        return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private List<DirectorTable> filterByAdjutancyId(List<DirectorTable> list, Long adjutancyId) {
-        return list.stream().filter( directorTable -> directorTable.getAdjutancyId().equals(adjutancyId) ).collect(Collectors.toList());
+    private boolean filterEmptry(Map<String, String> map) {
+        return filterUtil.filterEmptry(map);
     }
-
-    private List<DirectorTable> filterByParliamentaryId(List<DirectorTable> list, Long parliamentaryId) {
-        return list.stream().filter( directorTable -> directorTable.getParliamentaryId().equals(parliamentaryId) ).collect(Collectors.toList());
-    }
-
-    private Long isPresentReturnLong(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : Long.valueOf(str); }
 }

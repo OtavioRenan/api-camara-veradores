@@ -36,6 +36,12 @@ public class AdjutancyRepository implements AdjutancyRepositoryPort {
     }
 
     @Override
+    public List<Adjutancy> findAllWithFilters(String fields) {
+        return toListAdjuntacy(
+            repository.findAllWithFilters(fields));
+    }
+
+    @Override
     public Page<Adjutancy> findAll(int offset, int pageSize) {
         Page<AdjutancyEntity> models = repository.findAll(PageRequest.of(offset, pageSize));
 

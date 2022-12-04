@@ -35,6 +35,12 @@ public class CommissionRepository implements CommissionRepositoryPort {
     }
 
     @Override
+    public List<Commission> findAllWithFilters(String fields) {
+        return toListCommission(
+            repository.findAllWithFilters(fields));
+    }
+
+    @Override
     public Page<Commission> findAll(int offSet, int pageSize) {
         Page<CommissionEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
 

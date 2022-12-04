@@ -1,5 +1,6 @@
 package br.gov.application.camaramunicipal.domain.ports.repositorys;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ public interface ParliamentaryRepositoryPort {
     List<Parliamentary> findAll();
 
     List<Parliamentary> findAllLimit(int limit);
+
+    List<Parliamentary> findAllWithFilters(Long politicalParyId, Long legislatureId, Date birth, String fields);
 
     Page<Parliamentary> findAll(int offSet, int pageSize);
 

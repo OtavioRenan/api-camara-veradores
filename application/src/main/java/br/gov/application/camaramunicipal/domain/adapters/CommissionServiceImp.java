@@ -2,7 +2,6 @@ package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,12 +14,15 @@ import br.gov.application.camaramunicipal.domain.dtos.simples.CommissionSimpleDT
 import br.gov.application.camaramunicipal.domain.ports.interfaces.CommissionServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.CommissionRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
+import br.gov.application.camaramunicipal.utils.FiltersUtil;
 
 public class CommissionServiceImp implements CommissionServicePort {
 
     private final CommissionRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
+
+    private static final FiltersUtil filterUtil =  new FiltersUtil();
 
     public CommissionServiceImp(CommissionRepositoryPort repository) {
         this.repository = repository;
@@ -30,20 +32,20 @@ public class CommissionServiceImp implements CommissionServicePort {
     public List<CommissionSimpleDTO> findAll(Map<String, String> inputs) {
         List<Commission> models = repository.findAll();
 
-        models = filters(inputs, models);
+        if( filterEmptry(inputs) ) {
+            models.addAll( repository.findAllLimit(200) );
+        } else {
+            models.addAll( filter(inputs) );
+        }
 
         return models.stream().map( Commission::toCommissionSimpleDTO ).collect(Collectors.toList());
     }
 
     @Override
     public Page<CommissionSimpleDTO> findAll(Map<String, String> inputs, int offSet, int pageSize) {
-        if(inputs.size() > 0) {
-            List<CommissionSimpleDTO> models = findAll(inputs);
-            return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size());
-        }
+        List<CommissionSimpleDTO> models = findAll(inputs);
 
-        Page<Commission> pages = repository.findAll(offSet, pageSize);
-        return pages.map( Commission::toCommissionSimpleDTO );
+        return new PageImpl<>(models, PageRequest.of(offSet, pageSize), models.size()); 
     }
 
     @Override
@@ -80,22 +82,22 @@ public class CommissionServiceImp implements CommissionServicePort {
         repository.detele(commission);
     }
 
-    private List<Commission> filters(Map<String, String> inputs, List<Commission> models) {
+    List<Commission> filter(Map<String, String> input) {
+        
+        String fields = null;
 
-        String fields = isNullOrEmptry(inputs.get("fields"));
+        for(Map.Entry<String, String> v : input.entrySet()) {
+            if( equalsAndNoEmptry(v, "fields") ) { fields = v.getValue(); }
+        }
 
-        if(!Objects.isNull(fields)) { models = filterByFields(models, fields); }
-
-        return models;
+        return repository.findAllWithFilters(fields);
     }
 
-    private List<Commission> filterByFields(List<Commission> list, String fileds) {
-        return list.stream().filter( comission -> filterByFields(comission, fileds) ).collect(Collectors.toList());
+    private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
+        return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private boolean filterByFields(Commission commission, String fields) {
-        return commission.getName().contains(fields) || commission.getDescription().contains(fields);
+    private boolean filterEmptry(Map<String, String> map) {
+        return filterUtil.filterEmptry(map);
     }
-
-    private String isNullOrEmptry(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : str; }
 }

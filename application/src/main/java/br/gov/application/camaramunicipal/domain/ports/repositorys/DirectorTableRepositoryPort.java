@@ -11,6 +11,8 @@ public interface DirectorTableRepositoryPort {
 
     List<DirectorTable> findAllLimit(int limit);
 
+    List<DirectorTable> findAllWithFilters(Long legislatureId, Long adjutancyId, Long parliamentaryId);
+
     Page<DirectorTable> findAll(int offSet, int pageSize);
 
     DirectorTable findById(Long id);

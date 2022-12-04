@@ -35,6 +35,12 @@ public class DirectorTableRepository implements DirectorTableRepositoryPort {
     }
 
     @Override
+    public List<DirectorTable> findAllWithFilters(Long legislatureId, Long adjutancyId, Long parliamentaryId) {
+        return toListDirectorTable(
+            repository.findAllWithFilters(legislatureId, adjutancyId, parliamentaryId));
+    }
+
+    @Override
     public Page<DirectorTable> findAll(int offSet, int pageSize) {
         Page<DirectorTableEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
 

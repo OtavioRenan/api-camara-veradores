@@ -1,5 +1,6 @@
 package br.gov.application.camaramunicipal.infra.adapters.repositorys;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +34,12 @@ public class LegislatureRepository implements LegislatureRepositoryPort {
     public List<Legislature> findAllLimit(int limit) {
         return toListLegislature(
             repository.findAllLimit(limit));
+    }
+
+    @Override
+    public List<Legislature> findAllWithFilters(String fields, Date dateStart, Date dateEnd) {
+        return toListLegislature(
+            repository.findAllWithFilters(fields, dateStart, dateEnd));
     }
 
     @Override

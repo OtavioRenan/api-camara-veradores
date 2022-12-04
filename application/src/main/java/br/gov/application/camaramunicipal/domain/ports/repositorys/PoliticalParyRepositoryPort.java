@@ -11,6 +11,8 @@ public interface PoliticalParyRepositoryPort {
 
     List<PoliticalPary> findAllLimit(int limit);
 
+    List<PoliticalPary> findAllWithFilters(String fields);
+
     Page<PoliticalPary> findAll(int offSet, int pageSize);
 
     PoliticalPary findById(Long id);

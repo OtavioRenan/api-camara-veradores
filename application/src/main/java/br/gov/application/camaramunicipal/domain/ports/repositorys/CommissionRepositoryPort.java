@@ -11,6 +11,8 @@ public interface CommissionRepositoryPort {
 
     List<Commission> findAllLimit(int limit);
 
+    List<Commission> findAllWithFilters(String fields);
+
     Page<Commission> findAll(int offSet, int pageSize);
 
     Commission findById(Long id);

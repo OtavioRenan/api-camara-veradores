@@ -3,7 +3,6 @@ package br.gov.application.camaramunicipal.domain.adapters;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -16,11 +15,14 @@ import br.gov.application.camaramunicipal.domain.dtos.simples.ParliamentarySimpl
 import br.gov.application.camaramunicipal.domain.ports.interfaces.ParliamentaryServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.ParliamentaryRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
+import br.gov.application.camaramunicipal.utils.FiltersUtil;
 
 public class ParliamentaryServiceImp implements ParliamentaryServicePort {
     private final ParliamentaryRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
+
+    private static final FiltersUtil filterUtil =  new FiltersUtil();
 
     public ParliamentaryServiceImp(ParliamentaryRepositoryPort repository) {
         this.repository = repository;
@@ -30,20 +32,20 @@ public class ParliamentaryServiceImp implements ParliamentaryServicePort {
     public List<ParliamentarySimpleDTO> findAll(Map<String, String> inputs) {
         List<Parliamentary> models = repository.findAll();
 
-        models = filters(inputs, models);
+        if( filterEmptry(inputs) ) {
+            models.addAll( repository.findAllLimit(200) );
+        } else {
+            models.addAll( filter(inputs) );
+        }
         
         return models.stream().map( Parliamentary::toParliamentarySimpleDTO ).collect(Collectors.toList());
     }
 
     @Override
     public Page<ParliamentarySimpleDTO> findAll(Map<String, String> inputs, int offset, int pageSize) {
-        if(inputs.size() > 0) {
-            List<ParliamentarySimpleDTO> models = findAll(inputs);
-            return new PageImpl<>(models, PageRequest.of(offset, pageSize), models.size());
-        }
-
-        Page<Parliamentary> pages = repository.findAll(offset, pageSize);
-        return pages.map( Parliamentary::toParliamentarySimpleDTO );
+        List<ParliamentarySimpleDTO> models = findAll(inputs);
+        
+        return new PageImpl<>(models, PageRequest.of(offset, pageSize), models.size());      
     }
 
     @Override
@@ -80,62 +82,28 @@ public class ParliamentaryServiceImp implements ParliamentaryServicePort {
         repository.detele(parliamentary);
     }
 
-    private List<Parliamentary> filters(Map<String, String> inputs, List<Parliamentary> models) {
+    List<Parliamentary> filter(Map<String, String> input) {
+        
+        Long politicalParyId = null;
+        Long legislatureId = null;
+        Date birth = null;
+        String fields = null;
 
-        Long politicalParyId = isPresentReturnLong(inputs.get("politicalParyId"));
-        Long legislatureId = isPresentReturnLong(inputs.get("legislatureId"));
-        String name = isPresentReturnString(inputs.get("name"));
-        String socialName = isPresentReturnString(inputs.get("socialName"));
-        String email = isPresentReturnString(inputs.get("email"));
-        String numberPhone = isPresentReturnString(inputs.get("numberPhone"));
-        Date birth = isPresentReturnDate(inputs.get("birth"));
+        for(Map.Entry<String, String> v : input.entrySet()) {
+            if( equalsAndNoEmptry(v, "politicalParyId") ) { politicalParyId = Long.valueOf( v.getValue() ); }
+            if( equalsAndNoEmptry(v, "legislatureId") ) { legislatureId = Long.valueOf( v.getValue() ); }
+            if( equalsAndNoEmptry(v, "birth") ) { birth = Date.valueOf( v.getValue() ); }
+            if( equalsAndNoEmptry(v, "fields") ) { fields =  v.getValue(); }
+        }
 
-        if(!Objects.isNull(politicalParyId)) { models = filterByPoliticalParyId(models, politicalParyId); }
-        if(!Objects.isNull(legislatureId)) { models = filterByLegislatureId(models, legislatureId); }
-        if(!Objects.isNull(name)) { models = filterByName(models, name); }
-        if(!Objects.isNull(socialName)) { models = filterBySocialName(models, socialName); }
-        if(!Objects.isNull(email)) { models = filterByEmail(models, email); }
-        if(!Objects.isNull(numberPhone)) { models = filterByNumberPhone(models, numberPhone); }
-        if(!Objects.isNull(birth)) { models = filterByBirth(models, birth); }
-
-        return models;
+        return repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields);
     }
 
-    private List<Parliamentary> filterByPoliticalParyId(List<Parliamentary> list, Long politicalParyId) {
-        return list.stream().filter( parliamentary -> parliamentary.getPoliticalParyId().equals(politicalParyId) ).collect(Collectors.toList());
+    private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
+        return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private List<Parliamentary> filterByLegislatureId(List<Parliamentary> list, Long legislatureId) {
-        return list.stream().filter( parliamentary -> parliamentary.getLegislatureId().equals(legislatureId) ).collect(Collectors.toList());
+    private boolean filterEmptry(Map<String, String> map) {
+        return filterUtil.filterEmptry(map);
     }
-
-    private List<Parliamentary> filterByName(List<Parliamentary> list, String name) {
-        return list.stream().filter( parliamentary -> filterByName(parliamentary, name) ).collect(Collectors.toList());
-    }
-
-    private List<Parliamentary> filterBySocialName(List<Parliamentary> list, String socialName) {
-        return list.stream().filter( parliamentary -> filterByName(parliamentary, socialName) ).collect(Collectors.toList());
-    }
-
-    private List<Parliamentary> filterByEmail(List<Parliamentary> list, String email) {
-        return list.stream().filter( parliamentary -> parliamentary.getEmail().contains(email) ).collect(Collectors.toList());
-    }
-
-    private List<Parliamentary> filterByNumberPhone(List<Parliamentary> list, String numberPhone) {
-        return list.stream().filter( parliamentary -> parliamentary.getNumberPhone().contains(numberPhone) ).collect(Collectors.toList());
-    }
-
-    private List<Parliamentary> filterByBirth(List<Parliamentary> list, Date birth) {
-        return list.stream().filter( parliamentary -> parliamentary.getBirth().equals(birth) ).collect(Collectors.toList());
-    }
-
-    private boolean filterByName(Parliamentary parliamentary, String str) {
-        return parliamentary.getName().contains(str) || parliamentary.getSocialName().contains(str);
-    }
-
-    private String isPresentReturnString(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : str; }
-
-    private Long isPresentReturnLong(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : Long.valueOf(str); }
-
-    private Date isPresentReturnDate(String str) { return (Objects.isNull(str) || str.isEmpty()) ? null : Date.valueOf(str); }
 }

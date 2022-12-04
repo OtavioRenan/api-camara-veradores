@@ -11,6 +11,8 @@ public interface AdjutancyRepositoryPort {
 
     List<Adjutancy> findAllLimit(int limit);
 
+    List<Adjutancy> findAllWithFilters(String fields);
+
     Page<Adjutancy> findAll(int offSet, int pageSize);
 
     Adjutancy findById(Long id);

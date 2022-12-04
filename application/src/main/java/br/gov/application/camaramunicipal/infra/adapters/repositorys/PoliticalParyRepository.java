@@ -35,6 +35,12 @@ public class PoliticalParyRepository implements PoliticalParyRepositoryPort {
     }
 
     @Override
+    public List<PoliticalPary> findAllWithFilters(String fields) {
+        return toListPoliticalPary(
+            repository.findAllWithFilters(fields));
+    }
+
+    @Override
     public Page<PoliticalPary> findAll(int offSet, int pageSize) {
         Page<PoliticalParyEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
 
