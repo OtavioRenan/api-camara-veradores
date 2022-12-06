@@ -50,7 +50,8 @@ public class LegislatureServiceImpTest {
 
     @BeforeEach
     public void setup() {
-        when(repository.findAll()).thenReturn(legislatures());
+        when(repository.findAll()).thenReturn(legislatures());        
+        when(repository.findAllLimit(200)).thenReturn(legislatures());
         when(repository.findById(LEGISLATURE.getId())).thenReturn(LEGISLATURE);
         when(repository.save(any(Legislature.class))).thenReturn(LEGISLATURE);
         spy(LEGISLATURE);

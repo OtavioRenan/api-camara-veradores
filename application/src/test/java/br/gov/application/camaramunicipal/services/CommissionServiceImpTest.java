@@ -50,6 +50,7 @@ public class CommissionServiceImpTest {
     @BeforeEach
     public void setup() {
         when(repository.findAll()).thenReturn(mockCommissions());
+        when(repository.findAllLimit(200)).thenReturn(mockCommissions());
         when(repository.findById(COMMISSION.getId())).thenReturn(COMMISSION);
         when(repository.save(any(Commission.class))).thenReturn(COMMISSION);
         spy(COMMISSION);

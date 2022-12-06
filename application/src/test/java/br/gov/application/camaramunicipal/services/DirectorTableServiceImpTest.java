@@ -48,7 +48,8 @@ public class DirectorTableServiceImpTest {
 
     @BeforeEach
     public void setup() {
-        when(repository.findAll()).thenReturn(directorTables());
+        when(repository.findAll()).thenReturn(directorTables());        
+        when(repository.findAllLimit(200)).thenReturn(directorTables());
         when(repository.findById(DIRECTOR_TABLE.getId())).thenReturn(DIRECTOR_TABLE);
         when(repository.save(any(DirectorTable.class))).thenReturn(DIRECTOR_TABLE);
         spy(DIRECTOR_TABLE);

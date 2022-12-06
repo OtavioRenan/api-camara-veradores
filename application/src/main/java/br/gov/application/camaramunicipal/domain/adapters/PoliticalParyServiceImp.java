@@ -1,12 +1,11 @@
 package br.gov.application.camaramunicipal.domain.adapters;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.PoliticalPary;
 import br.gov.application.camaramunicipal.domain.dtos.PoliticalParyDTO;
@@ -15,6 +14,7 @@ import br.gov.application.camaramunicipal.domain.ports.interfaces.PoliticalParyS
 import br.gov.application.camaramunicipal.domain.ports.repositorys.PoliticalParyRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
+import br.gov.application.camaramunicipal.utils.PageableUtil;
 
 public class PoliticalParyServiceImp implements PoliticalParyServicePort {
     private final PoliticalParyRepositoryPort repository;
@@ -29,7 +29,7 @@ public class PoliticalParyServiceImp implements PoliticalParyServicePort {
 
     @Override
     public List<PoliticalParySimpleDTO> findAll(Map<String, String> inputs) {
-        List<PoliticalPary> models = repository.findAll();
+        List<PoliticalPary> models = new ArrayList<>();
 
         if( filterEmptry(inputs) ) {
             models.addAll( repository.findAllLimit(200) );
@@ -44,7 +44,7 @@ public class PoliticalParyServiceImp implements PoliticalParyServicePort {
     public Page<PoliticalParySimpleDTO> findAll(Map<String, String> inputs, int offset, int pageSize) {
         List<PoliticalParySimpleDTO> models = findAll(inputs);
         
-        return new PageImpl<>(models, PageRequest.of(offset, pageSize), models.size());        
+        return new PageableUtil().pageable(models, offset, pageSize);       
     }
 
     @Override

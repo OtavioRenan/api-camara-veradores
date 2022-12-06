@@ -1,13 +1,12 @@
 package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.Legislature;
 import br.gov.application.camaramunicipal.domain.dtos.LegislatureDTO;
@@ -16,6 +15,7 @@ import br.gov.application.camaramunicipal.domain.ports.interfaces.LegislatureSer
 import br.gov.application.camaramunicipal.domain.ports.repositorys.LegislatureRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
+import br.gov.application.camaramunicipal.utils.PageableUtil;
 
 public class LegislatureServiceImp implements LegislatureServicePort {
     private final LegislatureRepositoryPort repository;
@@ -30,7 +30,7 @@ public class LegislatureServiceImp implements LegislatureServicePort {
 
     @Override
     public List<LegisLatureSimpleDTO> findAll(Map<String, String> inputs) {
-        List<Legislature> models = repository.findAll();
+        List<Legislature> models = new ArrayList<>();
 
         if( filterEmptry(inputs) ) {
             models.addAll( repository.findAllLimit(200) );
@@ -45,7 +45,7 @@ public class LegislatureServiceImp implements LegislatureServicePort {
     public Page<LegisLatureSimpleDTO> findAll(Map<String, String> inputs, int offset, int pageSize) {
         List<LegisLatureSimpleDTO> models = findAll(inputs);
 
-        return new PageImpl<>(models, PageRequest.of(offset, pageSize), models.size());
+        return new PageableUtil().pageable(models, offset, pageSize);
     }
 
     @Override

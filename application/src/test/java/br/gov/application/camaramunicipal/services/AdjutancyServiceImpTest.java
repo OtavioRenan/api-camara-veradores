@@ -50,6 +50,7 @@ public class AdjutancyServiceImpTest {
     @BeforeEach
     public void setup() {
         when(repository.findAll()).thenReturn(mockAdjutancies());
+        when(repository.findAllLimit(200)).thenReturn(mockAdjutancies());
         when(repository.findById(ADJUTANCY.getId())).thenReturn(ADJUTANCY);
         when(repository.save(any(Adjutancy.class))).thenReturn(ADJUTANCY);
         spy(ADJUTANCY);
