@@ -20,4 +20,6 @@ public interface AdjutancyServicePort {
     AdjutancyDTO save(AdjutancyDTO dto, Long id);
 
     void delete(Long id);
+
+    void seed();
 }

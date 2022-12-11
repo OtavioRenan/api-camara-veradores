@@ -12,6 +12,7 @@ import br.gov.application.camaramunicipal.domain.dtos.AdjutancyDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.AdjutancySimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.AdjutancyServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.AdjutancyRepositoryPort;
+import br.gov.application.camaramunicipal.domain.seeds.AdjutancySeed;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
 import br.gov.application.camaramunicipal.utils.PageableUtil;
@@ -91,6 +92,13 @@ public class AdjutancyServiceImp implements AdjutancyServicePort {
         }
 
         return repository.findAllWithFilters(fields);
+    }
+
+    @Override
+    public void seed() {
+        List<AdjutancyDTO> dto = new AdjutancySeed().getAdjutancys();
+
+        dto.stream().forEach( this::save );
     }
 
     private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {

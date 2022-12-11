@@ -36,6 +36,11 @@ public class AdjutancyController
         return service.findAll(inputs);
     }
 
+    @GetMapping("/seed")
+    public void seed() {
+        service.seed();
+    }
+
     @GetMapping("/pagination/{offSet}/{pageSize}")
     public Page<AdjutancySimpleDTO> findAll(@RequestParam Map<String, String> inputs, @PathVariable int offSet, @PathVariable int pageSize) {
         return service.findAll(inputs, offSet, pageSize);
