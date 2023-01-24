@@ -12,9 +12,21 @@ pipeline {
                 '''
             }
         }
-        stage('Build') {
+        stage('Build Application') {
+            steps {
+                echo 'Building application.'
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 echo 'Building docker image.'
+            }
+        }
+
+        stage('Start Application') {
+            steps {
+                echo 'Start application.'
             }
         }
     }
