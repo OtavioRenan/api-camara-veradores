@@ -25,8 +25,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-
-### Files Docker ###
-docker-compose.yml
-Dockerfile

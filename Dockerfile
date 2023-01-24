@@ -1,6 +1,6 @@
 FROM openjdk:11
 
-ARG JAR_FILE=target/*.jar
+ARG JAR_FILE=application/target/*.jar
 
 COPY ${JAR_FILE} app.jar
 
