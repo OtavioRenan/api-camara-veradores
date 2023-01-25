@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent 'any'
 
     stages {
 
@@ -16,7 +16,6 @@ pipeline {
 
         stage('Build Application') {
             steps {
-                echo 'Building application.'
                 sh '''
                     docker-compose stop
                     cd application/
@@ -28,15 +27,17 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building docker image.'
                 sh 'docker-compose build'
             }
         }
 
-        stage('Start Application') {
+        stage('Start Tests') {
             steps {
-                echo 'Start application.'
-                // sh 'docker-compose up'
+                sh '''
+                    cd application/
+                    mvn --batch-mode -Dmaven.test.failure.ignore=true test
+                    cd ../
+                '''
             }
         }
     }
