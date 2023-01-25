@@ -36,7 +36,7 @@ pipeline {
         stage('Start Application') {
             steps {
                 echo 'Start application.'
-                sh 'docker-compose up'
+                // sh 'docker-compose up'
             }
         }
     }
