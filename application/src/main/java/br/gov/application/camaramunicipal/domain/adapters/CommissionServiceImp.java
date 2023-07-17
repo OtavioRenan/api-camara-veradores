@@ -1,11 +1,11 @@
 package br.gov.application.camaramunicipal.domain.adapters;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.Commission;
 import br.gov.application.camaramunicipal.domain.dtos.CommissionDTO;
@@ -14,7 +14,6 @@ import br.gov.application.camaramunicipal.domain.ports.interfaces.CommissionServ
 import br.gov.application.camaramunicipal.domain.ports.repositorys.CommissionRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
-import br.gov.application.camaramunicipal.utils.PageableUtil;
 
 public class CommissionServiceImp implements CommissionServicePort {
 
@@ -22,7 +21,7 @@ public class CommissionServiceImp implements CommissionServicePort {
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private static final FiltersUtil filterUtil =  new FiltersUtil();
+    private static final FiltersUtil filterUtil = new FiltersUtil();
 
     public CommissionServiceImp(CommissionRepositoryPort repository) {
         this.repository = repository;
@@ -30,28 +29,34 @@ public class CommissionServiceImp implements CommissionServicePort {
 
     @Override
     public List<CommissionSimpleDTO> findAll(Map<String, String> inputs) {
-        List<Commission> models = new ArrayList<>();
+        String fields = null;
 
-        if( filterEmptry(inputs) ) {
-            models.addAll( repository.findAllLimit(200) );
-        } else {
-            models.addAll( filter(inputs) );
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "fields")) {
+                fields = v.getValue();
+            }
         }
 
-        return models.stream().map( Commission::toCommissionSimpleDTO ).collect(Collectors.toList());
+        return toCommissionSimpleDTO(repository.findAllWithFilters(fields));
     }
 
     @Override
     public Page<CommissionSimpleDTO> findAll(Map<String, String> inputs, int offSet, int pageSize) {
-        List<CommissionSimpleDTO> models = findAll(inputs);
+        String fields = null;
 
-        return new PageableUtil().pageable(models, offSet, pageSize); 
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "fields")) {
+                fields = v.getValue();
+            }
+        }
+
+        return repository.findAllWithFilters(fields, PageRequest.of(offSet, pageSize)).map(this::toCommissionSimpleDTO);
     }
 
     @Override
     public CommissionDTO findById(Long id) {
         Commission model = repository.findById(id);
-        
+
         return model.toCommissionDTO();
     }
 
@@ -66,7 +71,7 @@ public class CommissionServiceImp implements CommissionServicePort {
     @Override
     public CommissionDTO save(CommissionDTO dto, Long id) {
         Commission oldModel = repository.findById(id);
-        
+
         Commission model = new Commission(dto);
         model.setCreatedAt(oldModel.getCreatedAt());
         model.setUpdatedAt(dateUtil.getNowWithZoneIdBr());
@@ -82,22 +87,15 @@ public class CommissionServiceImp implements CommissionServicePort {
         repository.detele(commission);
     }
 
-    List<Commission> filter(Map<String, String> input) {
-        
-        String fields = null;
-
-        for(Map.Entry<String, String> v : input.entrySet()) {
-            if( equalsAndNoEmptry(v, "fields") ) { fields = v.getValue(); }
-        }
-
-        return repository.findAllWithFilters(fields);
-    }
-
     private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
         return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private boolean filterEmptry(Map<String, String> map) {
-        return filterUtil.filterEmptry(map);
+    private CommissionSimpleDTO toCommissionSimpleDTO(Commission commission) {
+        return commission.toCommissionSimpleDTO();
+    }
+
+    private List<CommissionSimpleDTO> toCommissionSimpleDTO(List<Commission> list) {
+        return list.stream().map(this::toCommissionSimpleDTO).collect(Collectors.toList());
     }
 }

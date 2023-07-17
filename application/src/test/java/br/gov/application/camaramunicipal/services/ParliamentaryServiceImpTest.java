@@ -52,7 +52,6 @@ public class ParliamentaryServiceImpTest {
     @BeforeEach
     public void setup() {
         when(repository.findAll()).thenReturn(parliamentaries());
-        when(repository.findAllLimit(200)).thenReturn(parliamentaries());
         when(repository.findById(PARLIAMENTARY.getId())).thenReturn(PARLIAMENTARY);
         when(repository.save(any(Parliamentary.class))).thenReturn(PARLIAMENTARY);
         spy(PARLIAMENTARY);

@@ -1,11 +1,11 @@
 package br.gov.application.camaramunicipal.domain.adapters;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.DirectorTable;
 import br.gov.application.camaramunicipal.domain.dtos.DirectorTableDTO;
@@ -14,7 +14,6 @@ import br.gov.application.camaramunicipal.domain.ports.interfaces.DirectorTableS
 import br.gov.application.camaramunicipal.domain.ports.repositorys.DirectorTableRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
-import br.gov.application.camaramunicipal.utils.PageableUtil;
 
 public class DirectorTableServiceImp implements DirectorTableServicePort {
 
@@ -22,7 +21,7 @@ public class DirectorTableServiceImp implements DirectorTableServicePort {
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private static final FiltersUtil filterUtil =  new FiltersUtil();
+    private static final FiltersUtil filterUtil = new FiltersUtil();
 
     public DirectorTableServiceImp(DirectorTableRepositoryPort repository) {
         this.repository = repository;
@@ -30,28 +29,52 @@ public class DirectorTableServiceImp implements DirectorTableServicePort {
 
     @Override
     public List<DirectorTableSimpleDTO> findAll(Map<String, String> inputs) {
-        List<DirectorTable> models = new ArrayList<>();
+        Long legislatureId = null;
+        Long adjutancyId = null;
+        Long parliamentaryId = null;
 
-        if( filterEmptry(inputs) ) {
-            models.addAll( repository.findAllLimit(200) );
-        } else {
-            models.addAll( filter(inputs) );
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "legislatureId")) {
+                legislatureId = Long.valueOf(v.getValue());
+            }
+            if (equalsAndNoEmptry(v, "adjutancyId")) {
+                adjutancyId = Long.valueOf(v.getValue());
+            }
+            if (equalsAndNoEmptry(v, "parliamentaryId")) {
+                parliamentaryId = Long.valueOf(v.getValue());
+            }
         }
 
-        return models.stream().map( DirectorTable::toDirectorTableSimpleDTO ).collect(Collectors.toList());
+        return toDirectorTableSimpleDTO(repository.findAllWithFilters(legislatureId, adjutancyId, parliamentaryId));
     }
 
     @Override
     public Page<DirectorTableSimpleDTO> findAll(Map<String, String> inputs, int offSet, int pageSize) {
-        List<DirectorTableSimpleDTO> models = findAll(inputs);
+        Long legislatureId = null;
+        Long adjutancyId = null;
+        Long parliamentaryId = null;
 
-        return new PageableUtil().pageable(models, offSet, pageSize);
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "legislatureId")) {
+                legislatureId = Long.valueOf(v.getValue());
+            }
+            if (equalsAndNoEmptry(v, "adjutancyId")) {
+                adjutancyId = Long.valueOf(v.getValue());
+            }
+            if (equalsAndNoEmptry(v, "parliamentaryId")) {
+                parliamentaryId = Long.valueOf(v.getValue());
+            }
+        }
+
+        return repository
+                .findAllWithFilters(legislatureId, adjutancyId, parliamentaryId, PageRequest.of(offSet, pageSize))
+                .map(this::toDirectorTableSimpleDTO);
     }
 
     @Override
     public DirectorTableDTO findById(Long id) {
         DirectorTable model = repository.findById(id);
-        
+
         return model.toDirectorTableDTO();
     }
 
@@ -66,7 +89,7 @@ public class DirectorTableServiceImp implements DirectorTableServicePort {
     @Override
     public DirectorTableDTO save(DirectorTableDTO dto, Long id) {
         DirectorTable oldModel = repository.findById(id);
-        
+
         DirectorTable model = new DirectorTable(dto);
         model.setCreatedAt(oldModel.getCreatedAt());
         model.setUpdatedAt(dateUtil.getNowWithZoneIdBr());
@@ -82,26 +105,15 @@ public class DirectorTableServiceImp implements DirectorTableServicePort {
         repository.detele(directorTable);
     }
 
-    List<DirectorTable> filter(Map<String, String> input) {
-        
-        Long legislatureId = null;
-        Long adjutancyId = null;
-        Long parliamentaryId = null;
-
-        for(Map.Entry<String, String> v : input.entrySet()) {
-            if( equalsAndNoEmptry(v, "legislatureId") ) { legislatureId = Long.valueOf( v.getValue() ); }
-            if( equalsAndNoEmptry(v, "adjutancyId") ) { adjutancyId = Long.valueOf( v.getValue() ); }
-            if( equalsAndNoEmptry(v, "parliamentaryId") ) { parliamentaryId = Long.valueOf( v.getValue() ); }
-        }
-
-        return repository.findAllWithFilters(legislatureId, adjutancyId, parliamentaryId);
-    }
-
     private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
         return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private boolean filterEmptry(Map<String, String> map) {
-        return filterUtil.filterEmptry(map);
+    private DirectorTableSimpleDTO toDirectorTableSimpleDTO(DirectorTable directorTable) {
+        return directorTable.toDirectorTableSimpleDTO();
+    }
+
+    private List<DirectorTableSimpleDTO> toDirectorTableSimpleDTO(List<DirectorTable> list) {
+        return list.stream().map(this::toDirectorTableSimpleDTO).collect(Collectors.toList());
     }
 }

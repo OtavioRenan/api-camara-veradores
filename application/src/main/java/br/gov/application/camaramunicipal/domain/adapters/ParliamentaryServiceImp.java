@@ -1,12 +1,12 @@
 package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.Parliamentary;
 import br.gov.application.camaramunicipal.domain.dtos.ParliamentaryDTO;
@@ -15,14 +15,13 @@ import br.gov.application.camaramunicipal.domain.ports.interfaces.ParliamentaryS
 import br.gov.application.camaramunicipal.domain.ports.repositorys.ParliamentaryRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
-import br.gov.application.camaramunicipal.utils.PageableUtil;
 
 public class ParliamentaryServiceImp implements ParliamentaryServicePort {
     private final ParliamentaryRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private static final FiltersUtil filterUtil =  new FiltersUtil();
+    private static final FiltersUtil filterUtil = new FiltersUtil();
 
     public ParliamentaryServiceImp(ParliamentaryRepositoryPort repository) {
         this.repository = repository;
@@ -30,28 +29,54 @@ public class ParliamentaryServiceImp implements ParliamentaryServicePort {
 
     @Override
     public List<ParliamentarySimpleDTO> findAll(Map<String, String> inputs) {
-        List<Parliamentary> models = new ArrayList<>();
+        Long politicalParyId = null;
+        Long legislatureId = null;
+        Date birth = null;
+        String fields = null;
 
-        if( filterEmptry(inputs) ) {
-            models.addAll( repository.findAllLimit(200) );
-        } else {
-            models.addAll( filter(inputs) );
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "politicalParyId")) {
+                politicalParyId = Long.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "legislatureId")) {
+                legislatureId = Long.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "birth")) {
+                birth = Date.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "fields")) {
+                fields = v.getValue();
+            }
         }
-        
-        return models.stream().map( Parliamentary::toParliamentarySimpleDTO ).collect(Collectors.toList());
+
+        return toParliamentarySimpleDTO(repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields));
     }
 
     @Override
     public Page<ParliamentarySimpleDTO> findAll(Map<String, String> inputs, int offset, int pageSize) {
-        List<ParliamentarySimpleDTO> models = findAll(inputs);
-        
-        return new PageableUtil().pageable(models, offset, pageSize);   
+        Long politicalParyId = null;
+        Long legislatureId = null;
+        Date birth = null;
+        String fields = null;
+
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "politicalParyId")) {
+                politicalParyId = Long.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "legislatureId")) {
+                legislatureId = Long.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "birth")) {
+                birth = Date.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "fields")) {
+                fields = v.getValue();
+            }
+        }
+
+        return repository
+                .findAllWithFilters(politicalParyId, legislatureId, birth, fields, PageRequest.of(offset, pageSize))
+                .map(this::toParliamentarySimpleDTO);
     }
 
     @Override
     public ParliamentaryDTO findById(Long id) {
         Parliamentary model = repository.findById(id);
-        
+
         return model.toParliamentaryDTO();
     }
 
@@ -82,28 +107,15 @@ public class ParliamentaryServiceImp implements ParliamentaryServicePort {
         repository.detele(parliamentary);
     }
 
-    List<Parliamentary> filter(Map<String, String> input) {
-        
-        Long politicalParyId = null;
-        Long legislatureId = null;
-        Date birth = null;
-        String fields = null;
-
-        for(Map.Entry<String, String> v : input.entrySet()) {
-            if( equalsAndNoEmptry(v, "politicalParyId") ) { politicalParyId = Long.valueOf( v.getValue() ); }
-            if( equalsAndNoEmptry(v, "legislatureId") ) { legislatureId = Long.valueOf( v.getValue() ); }
-            if( equalsAndNoEmptry(v, "birth") ) { birth = Date.valueOf( v.getValue() ); }
-            if( equalsAndNoEmptry(v, "fields") ) { fields =  v.getValue(); }
-        }
-
-        return repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields);
-    }
-
     private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
         return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private boolean filterEmptry(Map<String, String> map) {
-        return filterUtil.filterEmptry(map);
+    private ParliamentarySimpleDTO toParliamentarySimpleDTO(Parliamentary parliamentary) {
+        return parliamentary.toParliamentarySimpleDTO();
+    }
+
+    private List<ParliamentarySimpleDTO> toParliamentarySimpleDTO(List<Parliamentary> list) {
+        return list.stream().map(this::toParliamentarySimpleDTO).collect(Collectors.toList());
     }
 }

@@ -1,12 +1,12 @@
 package br.gov.application.camaramunicipal.domain.adapters;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import br.gov.application.camaramunicipal.domain.Legislature;
 import br.gov.application.camaramunicipal.domain.dtos.LegislatureDTO;
@@ -15,14 +15,13 @@ import br.gov.application.camaramunicipal.domain.ports.interfaces.LegislatureSer
 import br.gov.application.camaramunicipal.domain.ports.repositorys.LegislatureRepositoryPort;
 import br.gov.application.camaramunicipal.utils.FactoryFormatDateUtil;
 import br.gov.application.camaramunicipal.utils.FiltersUtil;
-import br.gov.application.camaramunicipal.utils.PageableUtil;
 
 public class LegislatureServiceImp implements LegislatureServicePort {
     private final LegislatureRepositoryPort repository;
 
     private static final FactoryFormatDateUtil dateUtil = new FactoryFormatDateUtil();
 
-    private static final FiltersUtil filterUtil =  new FiltersUtil();
+    private static final FiltersUtil filterUtil = new FiltersUtil();
 
     public LegislatureServiceImp(LegislatureRepositoryPort repository) {
         this.repository = repository;
@@ -30,28 +29,47 @@ public class LegislatureServiceImp implements LegislatureServicePort {
 
     @Override
     public List<LegisLatureSimpleDTO> findAll(Map<String, String> inputs) {
-        List<Legislature> models = new ArrayList<>();
+        String fields = null;
+        Date dateStart = null;
+        Date dateEnd = null;
 
-        if( filterEmptry(inputs) ) {
-            models.addAll( repository.findAllLimit(200) );
-        } else {
-            models.addAll( filter(inputs) );
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "fields")) {
+                fields = v.getValue();
+            } else if (equalsAndNoEmptry(v, "dateStart")) {
+                dateStart = Date.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "dateEnd")) {
+                dateEnd = Date.valueOf(v.getValue());
+            }
         }
-        
-        return models.stream().map( Legislature::toLegislatureSimple ).collect(Collectors.toList());
+
+        return toLegisLatureSimpleDTO(repository.findAllWithFilters(fields, dateStart, dateEnd));
     }
 
     @Override
     public Page<LegisLatureSimpleDTO> findAll(Map<String, String> inputs, int offset, int pageSize) {
-        List<LegisLatureSimpleDTO> models = findAll(inputs);
+        String fields = null;
+        Date dateStart = null;
+        Date dateEnd = null;
 
-        return new PageableUtil().pageable(models, offset, pageSize);
+        for (Map.Entry<String, String> v : inputs.entrySet()) {
+            if (equalsAndNoEmptry(v, "fields")) {
+                fields = v.getValue();
+            } else if (equalsAndNoEmptry(v, "dateStart")) {
+                dateStart = Date.valueOf(v.getValue());
+            } else if (equalsAndNoEmptry(v, "dateEnd")) {
+                dateEnd = Date.valueOf(v.getValue());
+            }
+        }
+
+        return repository.findAllWithFilters(fields, dateStart, dateEnd, PageRequest.of(offset, pageSize))
+                .map(this::toLegisLatureSimpleDTO);
     }
 
     @Override
     public LegislatureDTO findById(Long id) {
         Legislature model = repository.findById(id);
-        
+
         return model.toLegislature();
     }
 
@@ -81,27 +99,16 @@ public class LegislatureServiceImp implements LegislatureServicePort {
 
         repository.detele(legislature);
     }
-    
-    List<Legislature> filter(Map<String, String> input) {
-        
-        String fields = null;
-        Date dateStart = null;
-        Date dateEnd = null;
-
-        for(Map.Entry<String, String> v : input.entrySet()) {
-            if( equalsAndNoEmptry(v, "fields") ) { fields =  v.getValue(); }
-            if( equalsAndNoEmptry(v, "dateStart") ) { dateStart = Date.valueOf( v.getValue() ); }
-            if( equalsAndNoEmptry(v, "dateEnd") ) { dateEnd = Date.valueOf( v.getValue() ); }
-        }
-
-        return repository.findAllWithFilters(fields, dateStart, dateEnd);
-    }
 
     private boolean equalsAndNoEmptry(Map.Entry<String, String> map, String column) {
         return filterUtil.equalsAndNoEmptry(map, column);
     }
 
-    private boolean filterEmptry(Map<String, String> map) {
-        return filterUtil.filterEmptry(map);
+    private LegisLatureSimpleDTO toLegisLatureSimpleDTO(Legislature legislature) {
+        return legislature.toLegislatureSimple();
+    }
+
+    private List<LegisLatureSimpleDTO> toLegisLatureSimpleDTO(List<Legislature> list) {
+        return list.stream().map(this::toLegisLatureSimpleDTO).collect(Collectors.toList());
     }
 }

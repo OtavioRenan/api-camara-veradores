@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.Commission;
@@ -24,27 +24,17 @@ public class CommissionRepository implements CommissionRepositoryPort {
 
     @Override
     public List<Commission> findAll() {
-        return toListCommission(
-            repository.findAll());
-    }
-
-    @Override
-    public List<Commission> findAllLimit(int limit) {
-        return toListCommission(
-            repository.findAllLimit(limit));
+        return toCommission(repository.findAll());
     }
 
     @Override
     public List<Commission> findAllWithFilters(String fields) {
-        return toListCommission(
-            repository.findAllWithFilters(fields));
+        return toCommission(repository.findAllWithFilters(fields));
     }
 
     @Override
-    public Page<Commission> findAll(int offSet, int pageSize) {
-        Page<CommissionEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
-
-        return models.map( CommissionEntity::toCommission );
+    public Page<Commission> findAllWithFilters(String fields, Pageable pageable) {
+        return repository.findAllWithFilters(fields, pageable).map(this::toCommission);
     }
 
     @Override
@@ -53,12 +43,12 @@ public class CommissionRepository implements CommissionRepositoryPort {
 
         validIfModelExists(model);
 
-        return model.orElse( new CommissionEntity() ).toCommission();
+        return model.orElse(new CommissionEntity()).toCommission();
     }
 
     @Override
     public Commission save(Commission commission) {
-        return repository.save( new CommissionEntity(commission) ).toCommission();
+        return repository.save(new CommissionEntity(commission)).toCommission();
     }
 
     @Override
@@ -70,7 +60,11 @@ public class CommissionRepository implements CommissionRepositoryPort {
         new FactoryExceptionNotFund().create(model, "Comissão não encontrada.");
     }
 
-    private List<Commission> toListCommission(List<CommissionEntity> list) {
-        return list.stream().map( CommissionEntity::toCommission ).collect(Collectors.toList());
+    private Commission toCommission(CommissionEntity entity) {
+        return entity.toCommission();
+    }
+
+    private List<Commission> toCommission(List<CommissionEntity> list) {
+        return list.stream().map(this::toCommission).collect(Collectors.toList());
     }
 }

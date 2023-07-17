@@ -3,17 +3,16 @@ package br.gov.application.camaramunicipal.domain.ports.repositorys;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import br.gov.application.camaramunicipal.domain.PoliticalPary;
 
 public interface PoliticalParyRepositoryPort {
     List<PoliticalPary> findAll();
 
-    List<PoliticalPary> findAllLimit(int limit);
-
     List<PoliticalPary> findAllWithFilters(String fields);
 
-    Page<PoliticalPary> findAll(int offSet, int pageSize);
+    Page<PoliticalPary> findAllWithFilters(String fields, Pageable pageable);
 
     PoliticalPary findById(Long id);
 

@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import br.gov.application.camaramunicipal.domain.Parliamentary;
@@ -25,27 +25,19 @@ public class ParliamentaryRepository implements ParliamentaryRepositoryPort {
 
     @Override
     public List<Parliamentary> findAll() {
-        return toListParliamentary(
-            repository.findAll());
-    }
-
-    @Override
-    public List<Parliamentary> findAllLimit(int limit) {
-        return toListParliamentary(
-            repository.findAllLimit(limit));
+        return toParliamentary(repository.findAll());
     }
 
     @Override
     public List<Parliamentary> findAllWithFilters(Long politicalParyId, Long legislatureId, Date birth, String fields) {
-        return toListParliamentary(
-            repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields));
+        return toParliamentary(repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields));
     }
 
     @Override
-    public Page<Parliamentary> findAll(int offSet, int pageSize) {
-        Page<ParliamentaryEntity> models = repository.findAll(PageRequest.of(offSet, pageSize));
-
-        return models.map( ParliamentaryEntity::toParliamentary );
+    public Page<Parliamentary> findAllWithFilters(Long politicalParyId, Long legislatureId, Date birth, String fields,
+            Pageable pageable) {
+        return repository.findAllWithFilters(politicalParyId, legislatureId, birth, fields, pageable)
+                .map(this::toParliamentary);
     }
 
     @Override
@@ -54,24 +46,28 @@ public class ParliamentaryRepository implements ParliamentaryRepositoryPort {
 
         validIfModelExists(model);
 
-        return model.orElse( new ParliamentaryEntity() ).toParliamentary();
+        return model.orElse(new ParliamentaryEntity()).toParliamentary();
     }
 
     @Override
     public Parliamentary save(Parliamentary parliamentary) {
-        return repository.save( new ParliamentaryEntity(parliamentary) ).toParliamentary();
+        return repository.save(new ParliamentaryEntity(parliamentary)).toParliamentary();
     }
 
     @Override
-    public void detele(Parliamentary parliamentary) {        
-        repository.delete( new ParliamentaryEntity(parliamentary) );
+    public void detele(Parliamentary parliamentary) {
+        repository.delete(new ParliamentaryEntity(parliamentary));
     }
 
     private void validIfModelExists(Optional<?> model) {
         new FactoryExceptionNotFund().create(model, "Parlamentar não encontrado.");
     }
 
-    private List<Parliamentary> toListParliamentary(List<ParliamentaryEntity> list) {
-        return list.stream().map( ParliamentaryEntity::toParliamentary ).collect(Collectors.toList());
+    private Parliamentary toParliamentary(ParliamentaryEntity entity) {
+        return entity.toParliamentary();
+    }
+
+    private List<Parliamentary> toParliamentary(List<ParliamentaryEntity> list) {
+        return list.stream().map(this::toParliamentary).collect(Collectors.toList());
     }
 }

@@ -49,7 +49,6 @@ public class PoliticalParyServiceImpTest {
     @BeforeEach
     public void setup() {
         when(repository.findAll()).thenReturn(politicalParies());
-        when(repository.findAllLimit(200)).thenReturn(politicalParies());
         when(repository.findById(PARY.getId())).thenReturn(PARY);
         when(repository.save(any(PoliticalPary.class))).thenReturn(PARY);
         spy(PARY);
