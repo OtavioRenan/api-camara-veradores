@@ -4,11 +4,18 @@ pipeline {
         stage('Initial') {
             steps {
                 echo 'Add user docker'
-                sh 'usermod -aG docker $user'
-            }
+            }            
             // agent {
             //     docker { image 'maven' }
             // }
+        }
+        stage('Back-end') {
+            agent {
+                docker { image 'maven:3.9.4-eclipse-temurin-17-alpine' }
+            }
+            steps {
+                sh 'mvn --version'
+            }
         }
     //     stage('Initial') {
     //         steps {
