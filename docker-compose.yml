@@ -1,14 +1,5 @@
-version: '3.8'
+version: '3'
 services:
-#   springboot:
-#     build: 
-#       context: ./
-#       dockerfile: ./Dockerfile
-#     container_name: springboot-api-camara-vereadores
-#     image: api-camara-vereadores
-#     ports:
-#       - '8080:8080'
-#       - '5005:5005'
 
   jenkins:
     container_name: jenkins-camara-vereadores
@@ -21,6 +12,16 @@ services:
     volumes:
       - ./docker/storage/jenkins_configuration:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+#   springboot:
+#     build: 
+#       context: ./
+#       dockerfile: ./Dockerfile
+#     container_name: springboot-api-camara-vereadores
+#     image: api-camara-vereadores
+#     ports:
+#       - '8080:8080'
+#       - '5005:5005'
 
 volumes:
   jenkins_configuration:
+    driver: local

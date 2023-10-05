@@ -1,5 +1,5 @@
 pipeline {
-    agent 'none'
+    agent 'any'
     stages {
         stage('Initial') {
             agent {
@@ -8,9 +8,7 @@ pipeline {
 
             steps {
                 echo 'Install e verify Maven.'
-                sh '''
-                    mvn package -Dmaven.test.skip=true
-                '''
+                sh 'mvn --version'
             }
         }
     //     stage('Initial') {
