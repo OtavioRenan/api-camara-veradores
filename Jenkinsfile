@@ -2,13 +2,13 @@ pipeline {
     agent 'none'
     stages {
         stage('Initial') {
-            agent {
-                docker { image 'maven' }
+            steps {
+                echo 'Add user docker'
+                sh 'usermod -ag docker $user'
             }
 
-            steps {
-                echo 'Install e verify Maven.'
-                sh 'mvn --version'
+            agent {
+                docker { image 'maven' }
             }
         }
     //     stage('Initial') {
