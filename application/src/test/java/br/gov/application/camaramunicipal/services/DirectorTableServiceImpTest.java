@@ -24,11 +24,14 @@ import br.gov.application.camaramunicipal.domain.ports.repositorys.DirectorTable
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class DirectorTableServiceImpTest {
+class DirectorTableServiceImpTest {
     @TestConfiguration
     static class DirectorTableServiceImpTestConfig {
         @Bean
@@ -47,15 +50,15 @@ public class DirectorTableServiceImpTest {
         new DirectorTable(1L, 1L, 1L, 1L, NOW, NOW);
 
     @BeforeEach
-    public void setup() {
-        when(repository.findAll()).thenReturn(directorTables());        
+    void setup() {
+        when(repository.findAllWithFilters(null, null, null)).thenReturn(directorTables());
         when(repository.findById(DIRECTOR_TABLE.getId())).thenReturn(DIRECTOR_TABLE);
         when(repository.save(any(DirectorTable.class))).thenReturn(DIRECTOR_TABLE);
         spy(DIRECTOR_TABLE);
     }
 
     @Test
-    public void success_when_acess_findAll() {
+    void success_when_acess_findAll() {
         List<DirectorTableSimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<DirectorTableSimpleDTO> expected = new ArrayList<>();
@@ -69,7 +72,7 @@ public class DirectorTableServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_FindById() {
+    void success_when_acess_findById() {
         DirectorTableDTO actual = service.findById(DIRECTOR_TABLE.getId());
         
         DirectorTableDTO expected = DIRECTOR_TABLE.toDirectorTableDTO();
@@ -81,7 +84,7 @@ public class DirectorTableServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_save() {
+    void success_when_acess_save() {
         DirectorTableDTO model = new DirectorTableDTO();
         model.setAdjutancyId(DIRECTOR_TABLE.getAdjutancyId());
         model.setLegislatureId(DIRECTOR_TABLE.getLegislatureId());
@@ -98,7 +101,7 @@ public class DirectorTableServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_update() {
+    void success_when_acess_update() {
         DirectorTableDTO actual = service.save(DIRECTOR_TABLE.toDirectorTableDTO());
         
         DirectorTableDTO expected = DIRECTOR_TABLE.toDirectorTableDTO();
@@ -110,8 +113,12 @@ public class DirectorTableServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_delete() {
+    void success_when_acess_delete() {
+        doNothing().when(repository).detele(DIRECTOR_TABLE);
+
         service.delete(DIRECTOR_TABLE.getId());
+
+        verify(repository, times(1)).detele(DIRECTOR_TABLE);
     }
 
     private List<DirectorTable> directorTables() {

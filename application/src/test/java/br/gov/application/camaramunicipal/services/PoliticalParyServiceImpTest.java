@@ -24,12 +24,15 @@ import br.gov.application.camaramunicipal.domain.ports.repositorys.PoliticalPary
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 @ExtendWith(SpringExtension.class)
-public class PoliticalParyServiceImpTest {
+class PoliticalParyServiceImpTest {
     @TestConfiguration
     static class PoliticalParyServiceImpTestConfig {
         @Bean
@@ -47,15 +50,15 @@ public class PoliticalParyServiceImpTest {
     private static final PoliticalPary PARY = new PoliticalPary(1L, "Teste", "TT", NOW, NOW);
 
     @BeforeEach
-    public void setup() {
-        when(repository.findAll()).thenReturn(politicalParies());
+    void setup() {
+        when(repository.findAllWithFilters(null)).thenReturn(politicalParies());
         when(repository.findById(PARY.getId())).thenReturn(PARY);
         when(repository.save(any(PoliticalPary.class))).thenReturn(PARY);
         spy(PARY);
     }
 
     @Test
-    public void success_when_acess_findAll() {
+    void success_when_acess_findAll() {
         List<PoliticalParySimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<PoliticalParySimpleDTO> expected = new ArrayList<>();
@@ -67,7 +70,7 @@ public class PoliticalParyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_FindById() {
+    void success_when_acess_findById() {
         PoliticalParyDTO actual = service.findById(PARY.getId());
 
         PoliticalParyDTO expected = PARY.toPoliticalParyDTO();
@@ -78,7 +81,7 @@ public class PoliticalParyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_save() {
+    void success_when_acess_save() {
         PoliticalParyDTO model = new PoliticalParyDTO();
         model.setName(PARY.getName());
         model.setInitials(PARY.getInitials());
@@ -93,7 +96,7 @@ public class PoliticalParyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_update() {
+    void success_when_acess_update() {
         PoliticalParyDTO actual = service.save(PARY.toPoliticalParyDTO());
         
         PoliticalParyDTO expected = PARY.toPoliticalParyDTO();
@@ -104,8 +107,12 @@ public class PoliticalParyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_delete() {
+    void success_when_acess_delete() {
+        doNothing().when(repository).detele(PARY);
+
         service.delete(PARY.getId());
+
+        verify(repository, times(1)).detele(PARY);
     }
 
     private List<PoliticalPary> politicalParies() {

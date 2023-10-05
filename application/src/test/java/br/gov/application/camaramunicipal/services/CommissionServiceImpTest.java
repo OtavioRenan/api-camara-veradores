@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.gov.application.camaramunicipal.domain.Commission;
@@ -24,11 +27,14 @@ import br.gov.application.camaramunicipal.domain.ports.repositorys.CommissionRep
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class CommissionServiceImpTest {
+class CommissionServiceImpTest {
     @TestConfiguration
     static class CommissionServiceImpTestConfig {
         @Bean
@@ -46,17 +52,21 @@ public class CommissionServiceImpTest {
     private static final Commission COMMISSION =
         new Commission(1L, "Constituição e Justiça", "Permanente", NOW, NOW);
 
+        private static final int OFF_SET = 0;
+
+        private static final int PAGE_SIZE = 5;
 
     @BeforeEach
-    public void setup() {
-        when(repository.findAll()).thenReturn(mockCommissions());
+    void setup() {
+        when(repository.findAllWithFilters(null)).thenReturn(mockCommissions());
+        when(repository.findAllWithFilters(null, PageRequest.of(OFF_SET, PAGE_SIZE))).thenReturn(mockPageCommissions());
         when(repository.findById(COMMISSION.getId())).thenReturn(COMMISSION);
         when(repository.save(any(Commission.class))).thenReturn(COMMISSION);
         spy(COMMISSION);
     }
 
     @Test
-    public void success_when_acess_findAll() {
+    void success_when_acess_findAll() {
         List<CommissionSimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<CommissionSimpleDTO> expected = new ArrayList<>();
@@ -68,8 +78,26 @@ public class CommissionServiceImpTest {
         assertEquals(expected.get(0).getDescription(), actual.get(0).getDescription());
     }
 
+        @Test
+    public void success_when_acess_findAll_with_pageable() {
+        Page<CommissionSimpleDTO> actual = service.findAll(makeFilter("", ""), OFF_SET, PAGE_SIZE);
+        
+        Page<CommissionSimpleDTO> expected = mockPageCommissions().map(Commission::toCommissionSimpleDTO);
+     
+        assertEquals(expected.getNumber(), actual.getNumber());
+        assertEquals(expected.getNumberOfElements(), actual.getNumberOfElements());
+        assertEquals(expected.getSize(), actual.getSize());
+        assertEquals(expected.getSort(), actual.getSort());
+        assertEquals(expected.getTotalElements(), actual.getTotalElements());
+        assertEquals(expected.getTotalPages(), actual.getTotalPages());
+
+        assertEquals(expected.getContent().get(0).getId(), actual.getContent().get(0).getId());
+        assertEquals(expected.getContent().get(0).getName(), actual.getContent().get(0).getName());
+        assertEquals(expected.getContent().get(0).getDescription(), actual.getContent().get(0).getDescription());
+    }
+
     @Test
-    public void success_when_acess_FindById() {
+    void success_when_acess_findById() {
         CommissionDTO actual = service.findById(COMMISSION.getId());
         
         CommissionDTO expected = COMMISSION.toCommissionDTO();
@@ -80,7 +108,7 @@ public class CommissionServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_save() {
+    void success_when_acess_save() {
         CommissionDTO model = new CommissionDTO();
         model.setName(COMMISSION.getName());
         model.setDescription(COMMISSION.getDescription());
@@ -95,7 +123,7 @@ public class CommissionServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_update() {
+    void success_when_acess_update() {
         CommissionDTO actual = service.save(COMMISSION.toCommissionDTO());
         
         CommissionDTO expected = COMMISSION.toCommissionDTO();
@@ -106,8 +134,12 @@ public class CommissionServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_delete() {
+    void success_when_acess_delete() {
+        doNothing().when(repository).detele(COMMISSION);
+
         service.delete(COMMISSION.getId());
+
+        verify(repository, times(1)).detele(COMMISSION);
     }
 
     private List<Commission> mockCommissions() {
@@ -115,6 +147,10 @@ public class CommissionServiceImpTest {
         list.add(COMMISSION);
 
         return list;
+    }
+
+    private Page<Commission> mockPageCommissions() {
+        return new PageImpl<>(mockCommissions(), PageRequest.of(OFF_SET, PAGE_SIZE), mockCommissions().size());
     }
 
     private Map<String, String> makeFilter(String param, String value) {

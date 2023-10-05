@@ -25,11 +25,14 @@ import br.gov.application.camaramunicipal.domain.ports.repositorys.Parliamentary
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class ParliamentaryServiceImpTest {
+class ParliamentaryServiceImpTest {
     @TestConfiguration
     static class ParliamentaryServiceImpTestConfig {
         @Bean
@@ -50,15 +53,15 @@ public class ParliamentaryServiceImpTest {
             Date.valueOf("1990-01-01"), NOW, NOW);
 
     @BeforeEach
-    public void setup() {
-        when(repository.findAll()).thenReturn(parliamentaries());
+    void setup() {
+        when(repository.findAllWithFilters(null, null, null, null)).thenReturn(parliamentaries());
         when(repository.findById(PARLIAMENTARY.getId())).thenReturn(PARLIAMENTARY);
         when(repository.save(any(Parliamentary.class))).thenReturn(PARLIAMENTARY);
         spy(PARLIAMENTARY);
     }
 
     @Test
-    public void success_when_acess_findAll() {
+    void success_when_acess_findAll() {
         List<ParliamentarySimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<ParliamentarySimpleDTO> expected = new ArrayList<>();
@@ -72,7 +75,7 @@ public class ParliamentaryServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_FindById() {
+    void success_when_acess_findById() {
         ParliamentaryDTO actual = service.findById(PARLIAMENTARY.getId());
 
         ParliamentaryDTO expected = PARLIAMENTARY.toParliamentaryDTO();
@@ -85,7 +88,7 @@ public class ParliamentaryServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_save() {
+    void success_when_acess_save() {
         ParliamentaryDTO model = new ParliamentaryDTO(PARLIAMENTARY);
 
         ParliamentaryDTO actual = service.save(model);
@@ -101,7 +104,7 @@ public class ParliamentaryServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_update() {
+    void success_when_acess_update() {
         ParliamentaryDTO actual = service.save(PARLIAMENTARY.toParliamentaryDTO());
         
         ParliamentaryDTO expected = PARLIAMENTARY.toParliamentaryDTO();
@@ -115,8 +118,12 @@ public class ParliamentaryServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_delete() {
+    void success_when_acess_delete() {
+        doNothing().when(repository).detele(PARLIAMENTARY);
+
         service.delete(PARLIAMENTARY.getId());
+
+        verify(repository, times(1)).detele(PARLIAMENTARY);
     }
 
     private List<Parliamentary> parliamentaries() {

@@ -25,11 +25,14 @@ import br.gov.application.camaramunicipal.domain.ports.repositorys.LegislatureRe
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class LegislatureServiceImpTest {
+class LegislatureServiceImpTest {
     @TestConfiguration
     static class LegislatureServiceImpTestConfig {
         @Bean
@@ -49,15 +52,15 @@ public class LegislatureServiceImpTest {
             Date.valueOf("2018-01-01"), Date.valueOf("2022-01-01"), NOW, NOW);
 
     @BeforeEach
-    public void setup() {
-        when(repository.findAll()).thenReturn(legislatures());        
+    void setup() {
+        when(repository.findAllWithFilters(null, null, null)).thenReturn(legislatures());
         when(repository.findById(LEGISLATURE.getId())).thenReturn(LEGISLATURE);
         when(repository.save(any(Legislature.class))).thenReturn(LEGISLATURE);
         spy(LEGISLATURE);
     }
 
     @Test
-    public void success_when_acess_findAll() {
+    void success_when_acess_findAll() {
         List<LegisLatureSimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<LegisLatureSimpleDTO> expected = new ArrayList<>();
@@ -68,7 +71,7 @@ public class LegislatureServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_FindById() {
+    void success_when_acess_findById() {
         LegislatureDTO actual = service.findById(LEGISLATURE.getId());
 
         LegislatureDTO expected = LEGISLATURE.toLegislature();
@@ -80,7 +83,7 @@ public class LegislatureServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_save() {
+    void success_when_acess_save() {
         LegislatureDTO model = new LegislatureDTO();
         model.setDescription(LEGISLATURE.getDescription());
         model.setDateStart(LEGISLATURE.getDateStart());
@@ -97,7 +100,7 @@ public class LegislatureServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_update() {
+    void success_when_acess_update() {
         LegislatureDTO actual = service.save(LEGISLATURE.toLegislature());
         
         LegislatureDTO expected = LEGISLATURE.toLegislature();
@@ -109,8 +112,12 @@ public class LegislatureServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_delete() {
+    void success_when_acess_delete() {
+        doNothing().when(repository).detele(LEGISLATURE);
+
         service.delete(LEGISLATURE.getId());
+
+        verify(repository, times(1)).detele(LEGISLATURE);
     }
 
     private List<Legislature> legislatures() {

@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.gov.application.camaramunicipal.domain.Adjutancy;
@@ -24,7 +27,10 @@ import br.gov.application.camaramunicipal.domain.ports.repositorys.AdjutancyRepo
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -47,9 +53,14 @@ public class AdjutancyServiceImpTest {
     private static final Adjutancy ADJUTANCY =
         new Adjutancy(1L, "Presidente", "Presidente de Comissão", NOW, NOW);
 
+        private static final int OFF_SET = 0;
+
+        private static final int PAGE_SIZE = 5;
+
     @BeforeEach
     public void setup() {
-        when(repository.findAll()).thenReturn(mockAdjutancies());
+        when(repository.findAllWithFilters(null)).thenReturn(mockAdjutancies());
+        when(repository.findAllWithFilters(null, PageRequest.of(OFF_SET, PAGE_SIZE))).thenReturn(mockPageAdjutancies());
         when(repository.findById(ADJUTANCY.getId())).thenReturn(ADJUTANCY);
         when(repository.save(any(Adjutancy.class))).thenReturn(ADJUTANCY);
         spy(ADJUTANCY);
@@ -69,7 +80,25 @@ public class AdjutancyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_FindById() {
+    public void success_when_acess_findAll_with_pageable() {
+        Page<AdjutancySimpleDTO> actual = service.findAll(makeFilter("", ""), OFF_SET, PAGE_SIZE);
+        
+        Page<AdjutancySimpleDTO> expected = mockPageAdjutancies().map(Adjutancy::toAdjutancySimpleDTO);
+     
+        assertEquals(expected.getNumber(), actual.getNumber());
+        assertEquals(expected.getNumberOfElements(), actual.getNumberOfElements());
+        assertEquals(expected.getSize(), actual.getSize());
+        assertEquals(expected.getSort(), actual.getSort());
+        assertEquals(expected.getTotalElements(), actual.getTotalElements());
+        assertEquals(expected.getTotalPages(), actual.getTotalPages());
+
+        assertEquals(expected.getContent().get(0).getId(), actual.getContent().get(0).getId());
+        assertEquals(expected.getContent().get(0).getName(), actual.getContent().get(0).getName());
+        assertEquals(expected.getContent().get(0).getDescription(), actual.getContent().get(0).getDescription());
+    }
+
+    @Test
+    public void success_when_acess_findById() {
         AdjutancyDTO actual = service.findById(ADJUTANCY.getId());
         
         AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
@@ -107,7 +136,11 @@ public class AdjutancyServiceImpTest {
 
     @Test
     public void success_when_acess_delete() {
+        doNothing().when(repository).detele(ADJUTANCY);
+
         service.delete(ADJUTANCY.getId());
+
+        verify(repository, times(1)).detele(ADJUTANCY);
     }
 
     private List<Adjutancy> mockAdjutancies() {
@@ -115,6 +148,10 @@ public class AdjutancyServiceImpTest {
         models.add(ADJUTANCY);
         
         return models;
+    }
+
+    private Page<Adjutancy> mockPageAdjutancies() {
+        return new PageImpl<>(mockAdjutancies(), PageRequest.of(OFF_SET, PAGE_SIZE), mockAdjutancies().size());
     }
 
     private Map<String, String> makeFilter(String param, String value) {
