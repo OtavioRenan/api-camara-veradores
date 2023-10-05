@@ -1,16 +1,11 @@
 pipeline {
     agent 'any'
     stages {
-        steps {
-            echo 'Add user docker'
-            sh 'usermod -aG docker $user'
-        }
-
         stage('Initial') {
             steps {
-                sh 'Pass!'
+                echo 'Add user docker'
+                sh 'usermod -aG docker $user'
             }
-
             // agent {
             //     docker { image 'maven' }
             // }
