@@ -1,10 +1,14 @@
 pipeline {
     agent 'any'
     stages {
+        steps {
+            echo 'Add user docker'
+            sh 'usermod -aG docker $user'
+        }
+
         stage('Initial') {
             steps {
-                echo 'Add user docker'
-                sh 'usermod -ag docker $user'
+                sh 'Pass!'
             }
 
             // agent {
