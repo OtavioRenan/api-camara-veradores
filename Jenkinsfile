@@ -7,9 +7,9 @@ pipeline {
                 sh 'usermod -ag docker $user'
             }
 
-            agent {
-                docker { image 'maven' }
-            }
+            // agent {
+            //     docker { image 'maven' }
+            // }
         }
     //     stage('Initial') {
     //         steps {
