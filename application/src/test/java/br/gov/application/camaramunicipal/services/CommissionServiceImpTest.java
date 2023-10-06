@@ -78,7 +78,7 @@ class CommissionServiceImpTest {
         assertEquals(expected.get(0).getDescription(), actual.get(0).getDescription());
     }
 
-        @Test
+    @Test
     public void success_when_acess_findAll_with_pageable() {
         Page<CommissionSimpleDTO> actual = service.findAll(makeFilter("", ""), OFF_SET, PAGE_SIZE);
         
