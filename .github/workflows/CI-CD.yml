@@ -31,4 +31,4 @@ jobs:
       run: mvn -B package --file application/pom.xml
     
     - name: Run tests units
-      run: cd application/ mvn clean test
+      run: mvn -f application/ clean test
