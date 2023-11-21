@@ -1,5 +1,9 @@
 package br.gov.application.camaramunicipal.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +28,6 @@ import br.gov.application.camaramunicipal.domain.dtos.DirectorTableDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.DirectorTableSimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.DirectorTableServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.DirectorTableRepositoryPort;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class DirectorTableServiceImpTest {
@@ -72,7 +68,7 @@ class DirectorTableServiceImpTest {
         
         List<DirectorTableSimpleDTO> expected = new ArrayList<>();
         expected.add(DIRECTOR_TABLE.toDirectorTableSimpleDTO());
-     
+
         assertEquals(expected.size(), actual.size());
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getAdjutancyId(), actual.get(0).getAdjutancyId());
@@ -81,11 +77,11 @@ class DirectorTableServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_findAll_with_pageable() {
+    void success_when_acess_findAll_with_pageable() {
         Page<DirectorTableSimpleDTO> actual = service.findAll(makeFilter("", ""), OFF_SET, PAGE_SIZE);
         
         Page<DirectorTableSimpleDTO> expected = mockPageDirectorTables().map(DirectorTable::toDirectorTableSimpleDTO);
-     
+
         assertEquals(expected.getNumber(), actual.getNumber());
         assertEquals(expected.getNumberOfElements(), actual.getNumberOfElements());
         assertEquals(expected.getSize(), actual.getSize());
@@ -104,7 +100,7 @@ class DirectorTableServiceImpTest {
         DirectorTableDTO actual = service.findById(DIRECTOR_TABLE.getId());
         
         DirectorTableDTO expected = DIRECTOR_TABLE.toDirectorTableDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getAdjutancyId(), actual.getAdjutancyId());
         assertEquals(expected.getLegislatureId(), actual.getLegislatureId());
@@ -121,7 +117,7 @@ class DirectorTableServiceImpTest {
         DirectorTableDTO actual = service.save(model);
         
         DirectorTableDTO expected = DIRECTOR_TABLE.toDirectorTableDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getAdjutancyId(), actual.getAdjutancyId());
         assertEquals(expected.getLegislatureId(), actual.getLegislatureId());
@@ -133,7 +129,7 @@ class DirectorTableServiceImpTest {
         DirectorTableDTO actual = service.save(DIRECTOR_TABLE.toDirectorTableDTO());
         
         DirectorTableDTO expected = DIRECTOR_TABLE.toDirectorTableDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getAdjutancyId(), actual.getAdjutancyId());
         assertEquals(expected.getLegislatureId(), actual.getLegislatureId());

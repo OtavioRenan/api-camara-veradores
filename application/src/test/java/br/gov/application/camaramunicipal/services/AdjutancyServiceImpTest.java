@@ -1,5 +1,9 @@
 package br.gov.application.camaramunicipal.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,16 +29,8 @@ import br.gov.application.camaramunicipal.domain.dtos.simples.AdjutancySimpleDTO
 import br.gov.application.camaramunicipal.domain.ports.interfaces.AdjutancyServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.AdjutancyRepositoryPort;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(SpringExtension.class)
-public class AdjutancyServiceImpTest {
+class AdjutancyServiceImpTest {
 
     @TestConfiguration
     static class AdjutancyServiceImpTestCofig {
@@ -67,12 +63,12 @@ public class AdjutancyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_findAll() {
+    void success_when_acess_findAll() {
         List<AdjutancySimpleDTO> actual = service.findAll(makeFilter("", ""));
         
         List<AdjutancySimpleDTO> expected = new ArrayList<>();
         expected.add(ADJUTANCY.toAdjutancySimpleDTO());
-     
+
         assertEquals(expected.size(), actual.size());
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getName(), actual.get(0).getName());
@@ -80,11 +76,11 @@ public class AdjutancyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_findAll_with_pageable() {
+    void success_when_acess_findAll_with_pageable() {
         Page<AdjutancySimpleDTO> actual = service.findAll(makeFilter("", ""), OFF_SET, PAGE_SIZE);
         
         Page<AdjutancySimpleDTO> expected = mockPageAdjutancies().map(Adjutancy::toAdjutancySimpleDTO);
-     
+
         assertEquals(expected.getNumber(), actual.getNumber());
         assertEquals(expected.getNumberOfElements(), actual.getNumberOfElements());
         assertEquals(expected.getSize(), actual.getSize());
@@ -98,18 +94,18 @@ public class AdjutancyServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_findById() {
+    void success_when_acess_findById() {
         AdjutancyDTO actual = service.findById(ADJUTANCY.getId());
         
         AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
     }
 
     @Test
-    public void success_when_acess_save() {
+    void success_when_acess_save() {
         AdjutancyDTO model = new AdjutancyDTO();
         model.setName(ADJUTANCY.getName());
         model.setDescription(ADJUTANCY.getDescription());
@@ -117,25 +113,25 @@ public class AdjutancyServiceImpTest {
         AdjutancyDTO actual = service.save(model);
         
         AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
     }
 
     @Test
-    public void success_when_acess_update() {
+    void success_when_acess_update() {
         AdjutancyDTO actual = service.save(ADJUTANCY.toAdjutancyDTO());
         
         AdjutancyDTO expected = ADJUTANCY.toAdjutancyDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
     }
 
     @Test
-    public void success_when_acess_delete() {
+    void success_when_acess_delete() {
         doNothing().when(repository).detele(ADJUTANCY);
 
         service.delete(ADJUTANCY.getId());

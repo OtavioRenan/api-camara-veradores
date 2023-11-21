@@ -1,5 +1,9 @@
 package br.gov.application.camaramunicipal.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -22,14 +26,6 @@ import br.gov.application.camaramunicipal.domain.dtos.ParliamentaryDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.ParliamentarySimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.ParliamentaryServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.ParliamentaryRepositoryPort;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class ParliamentaryServiceImpTest {
@@ -66,7 +62,7 @@ class ParliamentaryServiceImpTest {
         
         List<ParliamentarySimpleDTO> expected = new ArrayList<>();
         expected.add(PARLIAMENTARY.toParliamentarySimpleDTO());
-     
+
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getSocialName(), actual.get(0).getSocialName());
         assertEquals(expected.get(0).getEmail(), actual.get(0).getEmail());
@@ -79,7 +75,7 @@ class ParliamentaryServiceImpTest {
         ParliamentaryDTO actual = service.findById(PARLIAMENTARY.getId());
 
         ParliamentaryDTO expected = PARLIAMENTARY.toParliamentaryDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getSocialName(), actual.getSocialName());
         assertEquals(expected.getEmail(), actual.getEmail());
@@ -94,7 +90,7 @@ class ParliamentaryServiceImpTest {
         ParliamentaryDTO actual = service.save(model);
         
         ParliamentaryDTO expected = PARLIAMENTARY.toParliamentaryDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getSocialName(), actual.getSocialName());
@@ -108,7 +104,7 @@ class ParliamentaryServiceImpTest {
         ParliamentaryDTO actual = service.save(PARLIAMENTARY.toParliamentaryDTO());
         
         ParliamentaryDTO expected = PARLIAMENTARY.toParliamentaryDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getSocialName(), actual.getSocialName());

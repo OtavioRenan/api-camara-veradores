@@ -1,5 +1,9 @@
 package br.gov.application.camaramunicipal.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -22,14 +26,6 @@ import br.gov.application.camaramunicipal.domain.dtos.LegislatureDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.LegisLatureSimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.LegislatureServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.LegislatureRepositoryPort;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class LegislatureServiceImpTest {
@@ -65,7 +61,7 @@ class LegislatureServiceImpTest {
         
         List<LegisLatureSimpleDTO> expected = new ArrayList<>();
         expected.add(LEGISLATURE.toLegislatureSimple());
-     
+
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getDescription(), actual.get(0).getDescription());
     }
@@ -75,7 +71,7 @@ class LegislatureServiceImpTest {
         LegislatureDTO actual = service.findById(LEGISLATURE.getId());
 
         LegislatureDTO expected = LEGISLATURE.toLegislature();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getDateStart(), actual.getDateStart());
@@ -92,7 +88,7 @@ class LegislatureServiceImpTest {
         LegislatureDTO actual = service.save(model);
         
         LegislatureDTO expected = LEGISLATURE.toLegislature();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getDateStart(), actual.getDateStart());
@@ -104,7 +100,7 @@ class LegislatureServiceImpTest {
         LegislatureDTO actual = service.save(LEGISLATURE.toLegislature());
         
         LegislatureDTO expected = LEGISLATURE.toLegislature();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getDateStart(), actual.getDateStart());

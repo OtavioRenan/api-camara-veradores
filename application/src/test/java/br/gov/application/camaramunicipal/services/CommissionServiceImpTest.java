@@ -1,5 +1,9 @@
 package br.gov.application.camaramunicipal.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +28,6 @@ import br.gov.application.camaramunicipal.domain.dtos.CommissionDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.CommissionSimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.CommissionServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.CommissionRepositoryPort;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class CommissionServiceImpTest {
@@ -71,7 +67,7 @@ class CommissionServiceImpTest {
         
         List<CommissionSimpleDTO> expected = new ArrayList<>();
         expected.add(COMMISSION.toCommissionSimpleDTO());
-     
+
         assertEquals(expected.size(), actual.size());
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getName(), actual.get(0).getName());
@@ -79,11 +75,11 @@ class CommissionServiceImpTest {
     }
 
     @Test
-    public void success_when_acess_findAll_with_pageable() {
+    void success_when_acess_findAll_with_pageable() {
         Page<CommissionSimpleDTO> actual = service.findAll(makeFilter("", ""), OFF_SET, PAGE_SIZE);
         
         Page<CommissionSimpleDTO> expected = mockPageCommissions().map(Commission::toCommissionSimpleDTO);
-     
+
         assertEquals(expected.getNumber(), actual.getNumber());
         assertEquals(expected.getNumberOfElements(), actual.getNumberOfElements());
         assertEquals(expected.getSize(), actual.getSize());
@@ -101,7 +97,7 @@ class CommissionServiceImpTest {
         CommissionDTO actual = service.findById(COMMISSION.getId());
         
         CommissionDTO expected = COMMISSION.toCommissionDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
@@ -116,7 +112,7 @@ class CommissionServiceImpTest {
         CommissionDTO actual = service.save(model);
         
         CommissionDTO expected = COMMISSION.toCommissionDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
@@ -127,7 +123,7 @@ class CommissionServiceImpTest {
         CommissionDTO actual = service.save(COMMISSION.toCommissionDTO());
         
         CommissionDTO expected = COMMISSION.toCommissionDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());

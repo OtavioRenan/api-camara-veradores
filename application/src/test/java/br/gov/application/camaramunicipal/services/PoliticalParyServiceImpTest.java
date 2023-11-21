@@ -1,5 +1,9 @@
 package br.gov.application.camaramunicipal.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +25,6 @@ import br.gov.application.camaramunicipal.domain.dtos.PoliticalParyDTO;
 import br.gov.application.camaramunicipal.domain.dtos.simples.PoliticalParySimpleDTO;
 import br.gov.application.camaramunicipal.domain.ports.interfaces.PoliticalParyServicePort;
 import br.gov.application.camaramunicipal.domain.ports.repositorys.PoliticalParyRepositoryPort;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 @ExtendWith(SpringExtension.class)
@@ -63,7 +59,7 @@ class PoliticalParyServiceImpTest {
         
         List<PoliticalParySimpleDTO> expected = new ArrayList<>();
         expected.add(PARY.toPoliticalParySimpleDTO());
-     
+
         assertEquals(expected.get(0).getId(), actual.get(0).getId());
         assertEquals(expected.get(0).getName(), actual.get(0).getName());
         assertEquals(expected.get(0).getInitials(), actual.get(0).getInitials());
@@ -74,7 +70,7 @@ class PoliticalParyServiceImpTest {
         PoliticalParyDTO actual = service.findById(PARY.getId());
 
         PoliticalParyDTO expected = PARY.toPoliticalParyDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getInitials(), actual.getInitials());
@@ -89,7 +85,7 @@ class PoliticalParyServiceImpTest {
         PoliticalParyDTO actual = service.save(model);
         
         PoliticalParyDTO expected = PARY.toPoliticalParyDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getInitials(), actual.getInitials());
@@ -100,7 +96,7 @@ class PoliticalParyServiceImpTest {
         PoliticalParyDTO actual = service.save(PARY.toPoliticalParyDTO());
         
         PoliticalParyDTO expected = PARY.toPoliticalParyDTO();
-     
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getInitials(), actual.getInitials());
